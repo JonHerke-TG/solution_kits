@@ -1,0 +1,24 @@
+CREATE  QUERY party_full_address(
+ Vertex<Party> p) FOR GRAPH Transaction_Fraud { 
+ 
+ // This query retrieves the complete address for a party, encompassing the street address, city, state, and zipcode.
+   start = {p};
+   MinAccum<VERTEX> @@address,  @@zipcode, @@state;
+   MinAccum<STRING> @@city;
+
+  
+   rlt = SELECT a 
+         FROM start:s -(Has_Address)- Address:a -(Located_In)- City:c - (Located_In)- State:t
+         ACCUM 
+           @@address += a,
+           @@city += c.city,
+           @@state += t;
+    rlt = SELECT a 
+         FROM start:s -(Has_Address)- Address:a -(Assigned_To)- Zipcode:z 
+         ACCUM @@zipcode += z;
+  
+   PRINT @@address AS Street_Address, @@city AS City, @@state AS State, @@zipcode AS Zipcode;
+    
+   
+         
+}

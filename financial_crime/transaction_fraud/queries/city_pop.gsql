@@ -1,0 +1,11 @@
+CREATE DISTRIBUTED QUERY city_pop(/* Parameters here */) FOR GRAPH Transaction_Fraud { 
+ 
+
+// Feature: This query propagate the city population information of the card owner to Payment_Transaction vertex.
+
+  MinAccum<INT> @city_pop;
+  rlt = SELECT s 
+  FROM Payment_Transaction:s -()- Card -()- Party -()- Address -()- City:t
+  ACCUM s.@city_pop = t.population
+  POST-ACCUM s.setAttr("city_pop",s.@city_pop);
+}

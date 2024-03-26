@@ -56,6 +56,11 @@ Start = SELECT s
   POST-ACCUM 
       IF result_attribute != "" THEN 
           s.setAttr(result_attribute, 0) END;
+    
+//clear previous edges 
+    dlt =SELECT s 
+      FROM Community:s -(Has_Community:e)- Card:c 
+      ACCUM delete(e);
 # Initialize: Label each vertex with its own internal ID
 S = SELECT x 
     FROM Start:x

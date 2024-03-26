@@ -1,0 +1,13 @@
+CREATE DISTRIBUTED QUERY occupation(/* Parameters here */) FOR GRAPH Transaction_Fraud { 
+ 
+
+// Feature: This query propagate the occupation of the card owner to Payment_Transaction vertex.
+
+
+  
+  MinAccum<STRING> @occupation;
+  rlt = SELECT s 
+  FROM Payment_Transaction:s -()- Card:t
+  ACCUM s.@occupation = t.occupation
+  POST-ACCUM s.setAttr("occupation",s.@occupation);
+}

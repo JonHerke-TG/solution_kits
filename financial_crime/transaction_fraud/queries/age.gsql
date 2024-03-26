@@ -1,0 +1,16 @@
+CREATE DISTRIBUTED QUERY age(/* Parameters here */) FOR GRAPH Transaction_Fraud { 
+ 
+
+// Feature: This query propagate the age information of the card owner to Payment_Transaction vertex.
+
+  MinAccum<INT> @age;
+  SetAccum<INT> @@DOB;
+  rlt = SELECT s 
+  FROM Payment_Transaction:s -()- Card -()- Party:t
+  ACCUM s.@age = year(now())-year(t.dob)
+  
+  POST-ACCUM s.setAttr("age",s.@age);
+
+  
+  
+}

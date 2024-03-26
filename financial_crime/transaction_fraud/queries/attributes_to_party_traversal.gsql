@@ -1,18 +1,29 @@
-CREATE QUERY single_card_lookup(
-  Vertex<Card> ver ) FOR GRAPH Transaction_Fraud { 
-// sample card vertex: 3577157368507054
-/**
-   * Feature:
-   *   This query returns the detailed attributes of a single Card vertex. 
-   *
+CREATE DISTRIBUTED QUERY attributes_to_party_traversal(
+  STRING v_type,
+  STRING id) FOR GRAPH Transaction_Fraud { 
+    
+  /*
+  This query navigates from any given attribute of a party's identification information to locate all other personally 
+    identifiable information (PII) associated with that party. 
+  
    * Parameters:
-   *   - Vertex<Card> ver specifies a single input Vertex
-   
-   * Output:
-   *  the query prints the results directly to the console.
-   
-   */
-   SetAccum<STRING> @@edge_type_set;
+   *   - v_type: the vertex type of the given PII attribute 
+   *   - id: the primary id of the given PII vertex
+  */
+    
+  SetAccum<VERTEX> @@set;
+  SetAccum<STRING> @@edge_type_set;
+  MinAccum<Vertex> @address, @full_name, @phone,@dob,@email,@ids,@device,@ips;  
+  VERTEX v;
+  v = to_vertex(id,v_type);
+ 
+  @@set += v;
+  start = @@set;
+    
+  rlt = SELECT t 
+        FROM start:s -()- Party:t;
+        
+ 
     @@edge_type_set = (
     "Has_Address",
     "Has_Full_Name",
@@ -23,11 +34,11 @@ CREATE QUERY single_card_lookup(
     "Has_Device",
     "Has_IP"
   );
-  MinAccum<Vertex> @address, @full_name, @phone,@dob,@email,@ids,@device,@ips;
+  
     
-    start = {ver};
+    
     rlt = SELECT s 
-      FROM start:s-(Party_Has_Card)- Party -(@@edge_type_set:e)- :t 
+      FROM rlt:s -(@@edge_type_set:e)- :t 
     ACCUM 
       Case e.type 
         WHEN "Has_Address" THEN
@@ -48,19 +59,17 @@ CREATE QUERY single_card_lookup(
               s.@ips += t  
     END;                     
   PRINT rlt[
-    rlt.card_number AS Card_Number,
-    rlt.@full_name AS Full_Name,
-    rlt.occupation AS Job,
     rlt.@address AS Address,
+    rlt.@full_name AS Full_Name,
     rlt.@phone AS Phone, 
     rlt.@dob AS DOB,
     rlt.@email AS Email,
     rlt.@ids AS ID,
     rlt.@device AS Device,
-    rlt.@ips AS IP,
-    rlt.pagerank AS Pagerank_Score,
-    rlt.c_id AS Community_ID,
-    rlt.c_size AS Comunity_Size
+    rlt.@ips AS IP
     ];
+    
+    
+ 
  
 }

@@ -1,0 +1,13 @@
+CREATE DISTRIBUTED QUERY gender(/* Parameters here */) FOR GRAPH Transaction_Fraud { 
+ 
+
+// Feature: This query propagate the gender information of the card owner to Payment_Transaction vertex.
+
+
+  
+  MinAccum<STRING> @gender;
+  rlt = SELECT s 
+  FROM Payment_Transaction:s -()- Card -()- Party:t 
+  ACCUM s.@gender = t.gender
+  POST-ACCUM s.setAttr("gender",s.@gender);
+}
