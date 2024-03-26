@@ -1,0 +1,501 @@
+{
+    "defaultGraph": "Transaction_Fraud",
+    "iconURL": "/studio/assets/gvis/icons/builtin/64/084-life-preserver.png",
+    "id": "i2VBukQb4K9BuU7NSn4k2E",
+    "pageConfigSeparated": true,
+    "pages": [
+        {
+            "chartMap": {
+                "4Gv9WVHpWMgTJpasq7VCUC": {
+                    "chartSettings": {
+                        "pageSize": 20,
+                        "showColumns": [
+                            {
+                                "isChecked": true,
+                                "name": "Matched pattern"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.id"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.amount"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.cd_com_size"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.cd_pagerank"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.cnt_repeated_card"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.com_cd_txn_avg_amt"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.com_cd_txn_cnt"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.com_cd_txn_max_amt"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.com_cd_txn_min_amt"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.com_cd_txn_total_amt"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.com_mer_txn_avg_amt"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.com_mer_txn_cnt"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.com_mer_txn_max_amt"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.com_mer_txn_min_amt"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.com_mer_txn_total_amt"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.indegree"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.is_fraud"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.max_txn_amt_interval"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.max_txn_cnt_interval"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.mer_cat"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.mer_cat_avg_amt"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.mer_cat_cnt"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.mer_cat_max_amt"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.mer_cat_min_amt"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.mer_cat_total_amt"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.mer_com_size"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.mer_pagerank"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.outdegree"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.shortest_path_length"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.transaction_time"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "Payment_Transaction.unix_time"
+                            }
+                        ],
+                        "tableColumns": [
+                            {
+                                "id": "Matched pattern",
+                                "isChecked": "true",
+                                "label": ""
+                            },
+                            {
+                                "children": [
+                                    {
+                                        "children": [
+                                            {
+                                                "id": "id",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            },
+                                            {
+                                                "id": "transaction_time",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            },
+                                            {
+                                                "id": "amount",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            },
+                                            {
+                                                "id": "is_fraud",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            },
+                                            {
+                                                "id": "unix_time",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            },
+                                            {
+                                                "id": "shortest_path_length",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            },
+                                            {
+                                                "id": "max_txn_amt_interval",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            },
+                                            {
+                                                "id": "max_txn_cnt_interval",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            },
+                                            {
+                                                "id": "cnt_repeated_card",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            },
+                                            {
+                                                "id": "com_mer_txn_cnt",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            },
+                                            {
+                                                "id": "com_mer_txn_total_amt",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            },
+                                            {
+                                                "id": "com_mer_txn_avg_amt",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            },
+                                            {
+                                                "id": "com_mer_txn_max_amt",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            },
+                                            {
+                                                "id": "com_mer_txn_min_amt",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            },
+                                            {
+                                                "id": "com_cd_txn_cnt",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            },
+                                            {
+                                                "id": "com_cd_txn_total_amt",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            },
+                                            {
+                                                "id": "com_cd_txn_avg_amt",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            },
+                                            {
+                                                "id": "com_cd_txn_max_amt",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            },
+                                            {
+                                                "id": "com_cd_txn_min_amt",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            },
+                                            {
+                                                "id": "indegree",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            },
+                                            {
+                                                "id": "outdegree",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            },
+                                            {
+                                                "id": "mer_cat",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            },
+                                            {
+                                                "id": "mer_cat_cnt",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            },
+                                            {
+                                                "id": "mer_cat_total_amt",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            },
+                                            {
+                                                "id": "mer_cat_avg_amt",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            },
+                                            {
+                                                "id": "mer_cat_max_amt",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            },
+                                            {
+                                                "id": "mer_cat_min_amt",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            },
+                                            {
+                                                "id": "mer_pagerank",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            },
+                                            {
+                                                "id": "cd_pagerank",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            },
+                                            {
+                                                "id": "mer_com_size",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            },
+                                            {
+                                                "id": "cd_com_size",
+                                                "isChecked": "true",
+                                                "type": "vertex"
+                                            }
+                                        ],
+                                        "id": "Payment_Transaction",
+                                        "isChecked": "true",
+                                        "type": "vertex"
+                                    }
+                                ],
+                                "id": "Vertices",
+                                "isChecked": "true",
+                                "isExpanded": true,
+                                "label": "Vertices"
+                            },
+                            {
+                                "children": [],
+                                "id": "Edges",
+                                "isChecked": "true",
+                                "isExpanded": false,
+                                "label": "Edges"
+                            }
+                        ],
+                        "tableHeaders": [
+                            "Matched pattern",
+                            "Payment_Transaction"
+                        ]
+                    },
+                    "graphName": "Transaction_Fraud",
+                    "hideWidgetName": false,
+                    "id": "4Gv9WVHpWMgTJpasq7VCUC",
+                    "patternLimit": "40",
+                    "query": "",
+                    "queryType": "pattern",
+                    "refreshRate": 0,
+                    "searchPattern": [
+                        {
+                            "alias": "Payment_Transaction",
+                            "data": "Payment_Transaction",
+                            "id": "88a51331-f732-4efb-a03f-94f37be53c7e",
+                            "orderBy": [
+                                {
+                                    "asc": true,
+                                    "expression": {
+                                        "type": "AttrVariable",
+                                        "value": "alias_schema_Payment_Transaction_0.id"
+                                    },
+                                    "label": "Payment_Transaction.id"
+                                }
+                            ],
+                            "shouldBeBold": "tr",
+                            "type": "vertex"
+                        }
+                    ],
+                    "staticData": "{}",
+                    "title": "Table",
+                    "type": "table",
+                    "version": "1711424019690751118"
+                }
+            },
+            "globalParameters": {},
+            "iconURL": "/studio/assets/gvis/icons/builtin/64/063-books.png",
+            "id": "c3VrB5N194pSxwethJNswH",
+            "isDetail": true,
+            "isNew": false,
+            "layouts": {
+                "md": [
+                    {
+                        "h": 36,
+                        "i": "4Gv9WVHpWMgTJpasq7VCUC",
+                        "moved": false,
+                        "static": false,
+                        "w": 10,
+                        "x": 0,
+                        "y": 0
+                    }
+                ]
+            },
+            "title": "Page2",
+            "version": "1711424025498411401",
+            "weight": 20
+        },
+        {
+            "chartMap": {
+                "brdLmWs6Nu8PuRbXGXjRo3": {
+                    "chartSettings": {},
+                    "graphName": "Transaction_Fraud",
+                    "hideWidgetName": false,
+                    "id": "brdLmWs6Nu8PuRbXGXjRo3",
+                    "patternLimit": 300,
+                    "query": "",
+                    "queryType": "pattern",
+                    "refreshRate": 0,
+                    "searchPattern": [
+                        {
+                            "data": "SHOW SCHEMA",
+                            "id": "SHOW SCHEMA",
+                            "type": "FUNC"
+                        }
+                    ],
+                    "staticData": "{}",
+                    "title": "Schema",
+                    "type": "internal-graph",
+                    "version": "1711423966059485552"
+                },
+                "crCeyUogTmbFdGsxQYjemx": {
+                    "chartSettings": {},
+                    "graphName": "Transaction_Fraud",
+                    "hideWidgetName": false,
+                    "id": "crCeyUogTmbFdGsxQYjemx",
+                    "patternLimit": "20",
+                    "query": "",
+                    "queryType": "pattern",
+                    "refreshRate": 0,
+                    "searchPattern": [
+                        {
+                            "alias": "Address",
+                            "data": "Address",
+                            "id": "f6809b11-5d15-467d-b47a-bfa966714187",
+                            "orderBy": [
+                                {
+                                    "asc": true,
+                                    "expression": {
+                                        "type": "AttrVariable",
+                                        "value": "alias_schema_Address_0.address"
+                                    },
+                                    "label": "Address.address"
+                                }
+                            ],
+                            "type": "vertex"
+                        },
+                        {
+                            "alias": "Assigned_To",
+                            "data": "Assigned_To",
+                            "direction": 0,
+                            "edgePairs": [
+                                {
+                                    "From": "Address",
+                                    "To": "Zipcode"
+                                },
+                                {
+                                    "From": "Zipcode",
+                                    "To": "City"
+                                }
+                            ],
+                            "from": "*",
+                            "id": "50980464-c59a-42f1-9b81-eb63d101637b",
+                            "to": "*",
+                            "type": "edge"
+                        },
+                        {
+                            "alias": "Zipcode",
+                            "data": "Zipcode",
+                            "id": "bdcafc12-b0d9-460e-bae3-83f770f32827",
+                            "type": "vertex"
+                        }
+                    ],
+                    "staticData": "{}",
+                    "title": "Widget2",
+                    "type": "internal-graph",
+                    "version": "1711423954004119370"
+                }
+            },
+            "globalParameters": {},
+            "iconURL": "/studio/assets/gvis/icons/builtin/64/076-brain.png",
+            "id": "qUWVNP2zjpyLG384TQmt8q",
+            "isDetail": true,
+            "isNew": false,
+            "layouts": {
+                "md": [
+                    {
+                        "h": 19,
+                        "i": "brdLmWs6Nu8PuRbXGXjRo3",
+                        "moved": false,
+                        "static": false,
+                        "w": 5,
+                        "x": 0,
+                        "y": 0
+                    },
+                    {
+                        "h": 19,
+                        "i": "crCeyUogTmbFdGsxQYjemx",
+                        "moved": false,
+                        "static": false,
+                        "w": 7,
+                        "x": 5,
+                        "y": 0
+                    }
+                ]
+            },
+            "title": "Page1",
+            "version": "1711423938379598658",
+            "weight": 10
+        }
+    ],
+    "title": "Transaction Fraud",
+    "userRoleForApp": "owner",
+    "version": "1711423856091184427"
+}

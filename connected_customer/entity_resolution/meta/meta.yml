@@ -1,0 +1,9 @@
+metadata:
+  name: Entity Resolution
+  graph: Entity_Resolution 
+  description: >
+    TigerGraph's Entity Resolution solution for Customer data helps organizations consolidate and unify customer records from different data sources. By leveraging graph analytics and machine learning, TigerGraph enables accurate identification and merging of customer records, improving data quality and customer insights. This solution is valuable for industries with complex customer data landscapes, such as banking, retail, and healthcare.
+  categories:
+    - Manufacturing
+    - Retail
+    - Healthcare

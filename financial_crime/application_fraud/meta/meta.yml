@@ -1,0 +1,10 @@
+metadata:
+  name: Application Fraud
+  graph: Application_Fraud
+  description: >
+    TigerGraph's solution for Application Fraud helps organizations in various industries, such as banking and finance, detect and prevent fraudulent activities during the application process. By leveraging graph analytics, machine learning, and real-time data, TigerGraph enables the identification of suspicious patterns and anomalies, reducing the risk of fraudulent applications.
+  categories:
+    - Banking
+    - Finance
+    - Insurance
+    - E-commerce

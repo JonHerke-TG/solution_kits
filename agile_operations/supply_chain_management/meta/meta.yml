@@ -1,0 +1,9 @@
+metadata:
+  name: Supply Chain Management
+  graph: Supply_Chain 
+  description: >
+    TigerGraph's Supply Chain Management solution provides organizations with the tools to optimize and streamline their supply chain operations. By leveraging graph-based data modeling and advanced analytics, TigerGraph enables real-time visibility into the supply chain network, improves demand forecasting, optimizes inventory management, and enhances collaboration among stakeholders. This solution benefits industries involved in complex supply chain processes, such as manufacturing, retail, and logistics.
+  categories:
+    - Manufacturing
+    - Retail
+    - Logistics

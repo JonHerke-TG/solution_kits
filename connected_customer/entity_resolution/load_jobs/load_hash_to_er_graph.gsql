@@ -1,7 +1,16 @@
 USE GRAPH Entity_Resolution
+
 DROP JOB load_hash_to_er_graph
+
+CREATE DATA_SOURCE s1 = """{
+    "type": "s3",
+    "file.reader.settings.fs.s3a.aws.credentials.provider": "org.apache.hadoop.fs.s3a.AnonymousAWSCredentialsProvider",
+    "access.key": "none",
+    "secret.key": "none"
+}""" FOR GRAPH Entity_Resolution
+
 CREATE LOADING JOB load_hash_to_er_graph FOR GRAPH Entity_Resolution {
-  DEFINE FILENAME data_source = "/home/tigergraph/tigergraph/er_test_data_100k_rows.csv";
+  DEFINE FILENAME data_source="$s1:s3://tigergraph-solution-kits/connected_customer/entity_resolution/data/er_test_data_100k_rows.csv";
   
   LOAD data_source TO TEMP_TABLE customer_has_email_address_hash_0_table(entityid, codename, realname) VALUES(gsql_concat($"account_aba",$"account_number",$"signalid"), FLATTEN (minHash(gsql_upper(gsql_trim($"emailaddress")),"3","8"), "|", 1), gsql_upper(gsql_trim($"emailaddress"))) USING SEPARATOR=",", HEADER="true", EOL="\n",QUOTE="double";
   LOAD TEMP_TABLE customer_has_email_address_hash_0_table TO VERTEX Email_Address_Hash VALUES($"codename");
@@ -17,4 +26,8 @@ CREATE LOADING JOB load_hash_to_er_graph FOR GRAPH Entity_Resolution {
 
 }
 
-# RUN LOADING JOB load_hash_to_er_graph USING data_source="/home/tigergraph/tigergraph/er_test_data_100k_rows.csv"
+RUN LOADING JOB load_hash_to_er_graph
+
+DROP JOB load_hash_to_er_graph
+
+DROP DATA_SOURCE s1

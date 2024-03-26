@@ -1,3 +1,3 @@
-gsql 1_create_schema.gsql 
-gsql 2_load_data.gsql
-. 3_install_queries.sh
+gsql schema/create_schema.gsql 
+gsql load_data.gsql
+. install_queries.sh

@@ -1,0 +1,9 @@
+metadata:
+  name: Mule Account Detection
+  graph: Mule Account 
+  description: >
+    TigerGraph's Mule Account Detection solution addresses the problem of mule accounts used in money laundering schemes. By leveraging graph analytics and machine learning, TigerGraph helps organizations identify suspicious account behaviors, detect money laundering patterns, and take proactive measures to prevent financial crimes. This solution is essential for industries dealing with large volumes of financial transactions, such as banking and fintech.
+  categories:
+    - Banking
+    - Finance
+    - Fintech
