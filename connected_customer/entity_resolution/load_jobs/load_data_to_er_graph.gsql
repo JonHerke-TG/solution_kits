@@ -1,7 +1,17 @@
 USE GRAPH Entity_Resolution
+
 DROP JOB load_data_to_er_graph
+
+CREATE DATA_SOURCE s1 = """{
+    "type": "s3",
+    "file.reader.settings.fs.s3a.aws.credentials.provider": "org.apache.hadoop.fs.s3a.AnonymousAWSCredentialsProvider",
+    "access.key": "none",
+    "secret.key": "none"
+}""" FOR GRAPH Entity_Resolution
+
 CREATE LOADING JOB load_data_to_er_graph FOR GRAPH Entity_Resolution {
-  DEFINE FILENAME data_source = "/home/tigergraph/tigergraph/er_test_data_100k_rows.csv";
+  DEFINE FILENAME data_source="$s1:s3://tigergraph-solution-kits/connected_customer/entity_resolution/data/er_test_data_100k_rows.csv";
+
   LOAD data_source TO VERTEX Entity VALUES(gsql_concat($"account_aba",$"account_number",$"signalid"), get_dt_now("")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
   LOAD data_source TO VERTEX Account_ABA VALUES(gsql_trim($"account_aba")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
   LOAD data_source TO VERTEX Account_Number VALUES(gsql_trim($"account_number")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
@@ -55,4 +65,8 @@ CREATE LOADING JOB load_data_to_er_graph FOR GRAPH Entity_Resolution {
   LOAD data_source TO EDGE Customer_Has_Std_Country VALUES(gsql_concat($"account_aba",$"account_number",$"signalid"), gsql_trim($"std_country")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
 }
 
-# RUN LOADING JOB load_data_to_er_graph USING data_source="/home/tigergraph/tigergraph/er_test_data_100k_rows.csv"
+RUN LOADING JOB load_data_to_er_graph
+
+DROP JOB load_data_to_er_graph
+
+DROP DATA_SOURCE s1

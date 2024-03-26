@@ -1,0 +1,9 @@
+metadata:
+  name: Product Recommendations
+  graph: Product_Recommendations 
+  description: >
+    TigerGraph's Product Recommendations solution helps organizations deliver personalized product recommendations to their customers. By analyzing customer behavior, purchase history, and product attributes, TigerGraph enables accurate and timely recommendations, enhancing customer engagement and driving sales. This solution benefits industries with e-commerce platforms, such as retail, online marketplaces, and streaming services.
+  categories:
+    - Retail
+    - E-commerce
+    - Streaming Services

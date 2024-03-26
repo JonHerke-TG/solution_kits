@@ -1,0 +1,14 @@
+USE GRAPH Transaction_Fraud
+
+# schema change job
+DROP JOB change_schema_of_Transaction_Fraud
+
+# data loading job && data source
+DROP JOB loading_data
+DROP DATA_SOURCE s1
+
+# clear query
+DROP QUERY ALL
+
+# clear schema
+DROP GRAPH Transaction_Fraud

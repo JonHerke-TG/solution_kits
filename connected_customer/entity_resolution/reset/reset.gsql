@@ -1,0 +1,15 @@
+USE GRAPH Entity_Resolution
+
+# schema change job
+DROP JOB change_schema_of_Transaction_Fraud
+
+# data loading job && data source
+DROP JOB load_hash_to_er_graph
+DROP JOB load_data_to_er_graph
+DROP DATA_SOURCE s1
+
+# clear query
+DROP QUERY ALL
+
+# clear schema
+DROP GRAPH Entity_Resolution
