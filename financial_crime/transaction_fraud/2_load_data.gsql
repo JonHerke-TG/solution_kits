@@ -4,8 +4,8 @@ CREATE LOADING JOB loading_data FOR GRAPH Transaction_Fraud {
       DEFINE FILENAME MyDataSource = "data/";
       LOAD MyDataSource TO VERTEX Merchant_Category VALUES($22) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
       LOAD MyDataSource TO VERTEX Merchant VALUES($25, _, _, _) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
-      LOAD MyDataSource TO VERTEX Payment_Transaction VALUES($20, $28, $23, $24, $21, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
-      LOAD MyDataSource TO VERTEX Card VALUES($1, _, _, _, _, _) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
+      LOAD MyDataSource TO VERTEX Payment_Transaction VALUES($20, $28, $23, $24, $21, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
+      LOAD MyDataSource TO VERTEX Card VALUES($1, _, _, _, _, $12) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
       LOAD MyDataSource TO VERTEX Party VALUES($1, _, $4, $13, _, gsql_concat($2,$3), gsql_current_time_epoch(_)) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
       LOAD MyDataSource TO VERTEX Party VALUES($25, _, _, _, _, _, gsql_current_time_epoch(_)) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
       LOAD MyDataSource TO VERTEX City VALUES($6, $11) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";

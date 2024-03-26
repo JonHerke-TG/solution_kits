@@ -1,0 +1,31 @@
+CREATE DISTRIBUTED QUERY merchant_transactions_stats(
+ Vertex<Merchant> v) FOR GRAPH Transaction_Fraud { 
+   
+  /*
+  This query provides transaction statistics for a specified merchant, including the count of transactions, total transaction amount, 
+  and the maximum, average, and minimum transaction amount.
+   */
+   SumAccum<INT> @count;
+   SumAccum<FLOAT> @amount;
+   MaxAccum<Float> @max;
+   MinAccum<FLOAT> @min;
+   AvgAccum @avg;
+   start={v};
+   rlt = SELECT s 
+         FROM start:s -(Merchant_Receive_Transaction)- Payment_Transaction:t 
+         ACCUM 
+         s.@count +=1,
+         s.@amount +=t.amount,
+         s.@max += t.amount,
+         s.@min += t.amount,
+         s.@avg += t.amount;
+   PRINT rlt[
+     rlt.@count AS Transaction_Count,
+     rlt.@amount AS Total_Transaction_Amount,
+     rlt.@max AS Maximum_Transaction_Amount,
+     rlt.@min AS Minimum_Transaction_Amount,
+     rlt.@avg AS Average_Transaction_Amount
+   ];
+   
+   
+}

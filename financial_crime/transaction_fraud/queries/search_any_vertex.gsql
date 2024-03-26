@@ -1,0 +1,16 @@
+CREATE QUERY search_any_vertex(STRING keyword) FOR GRAPH Transaction_Fraud { 
+ 
+  STRING nameSearch = "";
+  STRING wildcard = "%";
+  nameSearch = wildcard + lower(keyword) + wildcard;
+
+rlt =
+    SELECT v FROM :v
+    WHERE  lower(v.id) LIKE nameSearch OR
+           to_string(v.card_number) LIKE nameSearch OR
+           lower(v.category) LIKE nameSearch OR
+           to_string(v.id) == keyword
+    LIMIT 5;
+
+PRINT rlt;
+}

@@ -63,6 +63,47 @@
         }
       },
       {
+        "function_header": "attributes_to_party_traversal",
+        "description": "Retrieves all PII associated with a party from a specified identification attribute within the fraud detection graph.",
+        "docstring": "Originating from a chosen attribute of party identification information, this query methodically searches the transaction fraud graph to retrieve all associated PII for the specified party. Its utility is paramount in fraud detection and prevention frameworks, enabling a comprehensive analysis of party identities. Run the query with `runInstalledQuery('attributes_to_party_traversal', params={'v_type': 'INSERT_V_TYPE_HERE',  'id': 'INSERT_ID_HERE'})`",
+        "param_types": {
+            "v_type" : "string",
+            "id" : "string"
+        }
+      },
+      {
+        "function_header": "party_full_address",
+        "description": "This query retrieves the complete address for a party, encompassing the street address, city, state, and zipcode.",
+        "docstring": "This query retrieves the complete address for a party, encompassing the street address, city, state, and zipcode. It's essential for verifying and analyzing party location data, facilitating accurate and efficient address validation. Run the query with `runInstalledQuery('party_full_address', params={'p': 'INSERT_P_HERE'})`",
+        "param_types": {
+            "p" : "vertex"
+        }
+      },
+      {
+        "function_header": "merchant_transactions_stats",
+        "description": "This query provides transaction statistics for a specified merchant, including the count of transactions, total transaction amount, and the maximum, average, and minimum transaction amount.",
+        "docstring": "This query offers crucial insights into a merchant's transactional behavior by providing detailed statistics, including the count of transactions, total transaction amount, and the maximum, average, and minimum transaction amounts. It is instrumental for financial analysis, aiding in the detection of anomalies, fraud prevention, and the assessment of merchant performance. Run the query with `runInstalledQuery('merchant_transactions_stats', params={'v': 'INSERT_V_HERE'})`",
+        "param_types": {
+            "v" : "vertex"
+        }
+      },
+      {
+        "function_header": "card_transactions_stats",
+        "description": "This query provides transaction statistics for a specified card, including the count of transactions, total transaction amount, and the maximum, average, and minimum transaction amount.",
+        "docstring": "This query is designed to yield comprehensive statistics on transactions made using a specific card, encapsulating transaction count, total amount, and the maximum, average, and minimum transaction amounts. It serves as a pivotal tool for monitoring card usage, identifying spending patterns, and enhancing fraud detection efforts by pinpointing irregularities in transaction activities. Run the query with `runInstalledQuery('card_transactions_stats', params={'v': 'INSERT_V_HERE'})`",
+        "param_types": {
+            "v" : "vertex"
+        }
+      },
+      {
+        "function_header": "merchant_category_transactions_stats",
+        "description": "This query provides transaction statistics for a specified merchant category, including the count of transactions, total transaction amount, and the maximum, average, and minimum transaction amount.",
+        "docstring": "This query furnishes detailed transaction statistics for a specific merchant category, covering aspects such as the count of transactions, total transaction amount, and the maximum, average, and minimum transaction amounts. It's crucial for analyzing market trends, assessing the financial health of merchant categories, and detecting anomalies that could indicate fraudulent activity or market shifts. Run the query with `runInstalledQuery('merchant_category_transactions_stats', params={'v': 'INSERT_V_HERE'})`",
+        "param_types": {
+            "v" : "vertex"
+        }
+      },
+      {
         "function_header": "merchant_has_single_large_transactions",
         "description": "This query detects and returns all the cards that has single transaction with amount over m within specified time period",
         "docstring": "This query identifies and retrieves all merchants that have recorded a single transaction exceeding a specified amount m within a certain time frame. It is used to flag potential fraud or irregular activities by highlighting transactions that are unusually large for a given merchant, which could indicate suspicious or anomalous behavior. Run the query with `runInstalledQuery('merchant_has_single_large_transactions', params={'min_createTime': 'INSERT_MIN_CREATETIME_HERE', 'max_createTime': 'INSERT_MAX_CREATETIME_HERE', 'm' : 'INSERT_m_HERE' })` min_createTime defaults to 2020-01-01. max_createTime defaults to 2024-01-01. m defualts to 10000",

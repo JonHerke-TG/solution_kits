@@ -1,0 +1,13 @@
+CREATE DISTRIBUTED QUERY test_community(/* Parameters here */) FOR GRAPH Transaction_Fraud { 
+ SetAccum<FLOAT> @@max, @@min, @@avg, @@total;
+ SetAccum<INT> @@count ;
+  rlt = SELECT s 
+    FROM Payment_Transaction:s 
+    POST-ACCUM @@avg += s.com_cd_txn_avg_amt,
+    @@min +=s.com_cd_txn_min_amt,
+    @@max +=s.com_cd_txn_max_amt,
+    @@total += s.com_cd_txn_total_amt,
+    @@count +=s.com_cd_txn_cnt;
+  
+ PRINT  @@max.size(), @@min.size(), @@avg.size(), @@total.size(), @@count.size();
+}

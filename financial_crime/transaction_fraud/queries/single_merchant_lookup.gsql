@@ -12,7 +12,20 @@ CREATE QUERY single_merchant_lookup(
    *  the query prints the results directly to the console.
    
    */
-  rlt = {ver};
-  PRINT rlt;
+ 
+  MinAccum<Vertex> @category;
+    
+    start = {ver};
+    rlt = SELECT s 
+      FROM start:s -(Merchant_Assigned:e)- Merchant_Category:t
+      ACCUM s.@category += t;
+      
+  PRINT rlt[
+    rlt.id AS Merchant_Name,
+    rlt.@category AS Merchant_Category,
+    rlt.pagerank AS Pagerank_Score,
+    rlt.c_id AS Community_ID,
+    rlt.c_size AS Comunity_Size
+    ];
  
 }
