@@ -1,0 +1,232 @@
+CREATE OR REPLACE DISTRIBUTED QUERY match_party_entities(
+  FLOAT Customer_Full_Name_weight = 0.2,
+  FLOAT Customer_DOB_weight = 0.2,
+  FLOAT Customer_Email_weight = 0.2,
+  FLOAT Customer_Phone_weight = 0.2,
+  FLOAT Customer_Address_weight = 0.2,
+  FLOAT Customer_IP_weight = 0.2,
+  FLOAT Customer_ID_weight = 1.0,
+  FLOAT Customer_Device_weight = 1.0,
+  FLOAT Customer_Application_weight = 1.0,
+  FLOAT Customer_Account_weight = 1.0,
+  FLOAT Customer_Card_weight = 1.0,
+  INT num_of_source_batches = 10, // number of source batches
+  INT num_of_target_batches = 1, // number of target batches
+  FLOAT threshold = 1.0, // if a total matching score between two entities exceed the threshold, a similarity edge will be created between the matching entities
+  INT pii_low_connections_limit = 100, // maximum out degree of an attribute. The case will be skipped if the same attribute is connected to too many entities
+  INT pii_high_connections_limit = 25000, // maximum out degree of an attribute. The case will be skipped if the same attribute is connected to too many entities
+  DATETIME compute_entities_after_date = to_datetime("1970-01-01 00:00:00") // All entities that were created in TG after this date, will be computed to find similarity edges related to these new entities. The default value is the earliest time possible (great for the first time running this query)
+) {
+
+  ListAccum<VERTEX<Party>> @entity_list;
+  MapAccum<VERTEX<Party>,FLOAT> @entity_map;
+  SumAccum<INT> @@count;
+  MaxAccum<FLOAT> @@max;
+  MinAccum<FLOAT> @@min;
+  AvgAccum @@avg;
+  SetAccum<STRING> @@edge_type_set;
+  OrAccum @is_candidate;
+
+  /* PII connections that are used in this ER solution */
+  @@edge_type_set = (
+    "Has_Full_Name",
+    "Has_DOB",
+    "Has_Email",
+    "Has_Phone",
+    "Has_Address",
+    "Has_IP",
+    "Has_ID",
+    "Has_Device",
+    "Application_Has_Party",
+    "Party_Has_Account",
+    "Party_Has_Card"
+  );
+
+  DATETIME start_time = now();
+  log(true, "UDF:: match_entities start time: " + datetime_format(start_time));
+
+  all_entities = {Party.*};
+
+  /* Batching source entities */
+  
+  FOREACH i IN RANGE[0, num_of_source_batches-1] DO
+
+      /* Prepare the source batched entitities */
+  
+      batched_entities = SELECT s
+          FROM all_entities:s
+          WHERE getvid(s)%num_of_source_batches == i AND s.created_at > datetime_to_epoch(compute_entities_after_date)
+      ;
+  
+      batched_entities = SELECT s
+          FROM batched_entities:s-(@@edge_type_set:e)->:t
+          WHERE t.outdegree() > 1 AND t.outdegree() < pii_low_connections_limit
+      ;
+  
+      /* Prepare the low-degree PIIs that are connected to the source batched entitities */
+  
+      low_degree_piis = SELECT t
+          FROM batched_entities:s-(@@edge_type_set:e)->:t
+          WHERE t.outdegree() > 1 AND t.outdegree() < pii_low_connections_limit
+      ;
+  
+      /* For each high-degree PII that is connected to the relevant source batched entities,
+      save a list of all source batched entities on that PII */
+
+      piis = SELECT t
+          FROM batched_entities:s-(@@edge_type_set:e)->:t
+          WHERE t.outdegree(@@edge_type_set) > 1 AND t.outdegree() < pii_high_connections_limit
+          ACCUM
+                t.@entity_list += s
+      ;
+      
+      /* Batching target entities (nested batching) */
+  
+      FOREACH j IN RANGE[0, num_of_target_batches-1] DO
+  
+          /* Mapping the potential matches:
+          For each relevant low-degree PII (that is connected to the source batched entities),
+          check the target batched entities.
+          If there is a potential match (a PII in common between entities),
+          then save a key-value pair on the relevant entity
+          (where the key is the ID of the other similar entity and the value is the initial similarity score of 0).*/
+          
+          mapped_candidates = SELECT t
+              FROM low_degree_piis:s-(@@edge_type_set:e)->Party:t
+              WHERE getvid(t)%num_of_target_batches == j
+              ACCUM
+                t.@is_candidate += TRUE,
+                FOREACH v IN s.@entity_list DO
+                  IF getvid(v) < getvid(t) OR (v.created_at > datetime_to_epoch(compute_entities_after_date) AND t.created_at < datetime_to_epoch(compute_entities_after_date)) THEN
+                    t.@entity_map += (v->0.0)
+                  END
+                END
+          ;
+
+          /* Evaluate the potential matches (calculating similarity scores),
+          and insert the similarity edges between the similar entities.*/
+
+          evaluated_matches = SELECT t
+              FROM piis:s-(@@edge_type_set:e)->Party:t
+              WHERE getvid(t)%num_of_target_batches == j AND t.@is_candidate == TRUE
+              ACCUM
+                CASE e.type
+    
+                  WHEN "Has_Full_Name" THEN
+                      FOREACH v IN s.@entity_list DO
+                        IF t.@entity_map.containsKey(v) THEN
+                          t.@entity_map += (v->Customer_Full_Name_weight)
+                        END
+                      END
+    
+                  WHEN "Has_DOB" THEN
+                      FOREACH v IN s.@entity_list DO
+                        IF t.@entity_map.containsKey(v) THEN
+                          t.@entity_map += (v->Customer_DOB_weight)
+                        END
+                      END
+    
+                  WHEN "Has_Email" THEN
+                      FOREACH v IN s.@entity_list DO
+                        IF t.@entity_map.containsKey(v) THEN
+                          t.@entity_map += (v->Customer_Email_weight)
+                        END
+                      END
+  
+                  WHEN "Has_Phone" THEN
+                      FOREACH v IN s.@entity_list DO
+                        IF t.@entity_map.containsKey(v) THEN
+                          t.@entity_map += (v->Customer_Phone_weight)
+                        END
+                      END
+  
+                  WHEN "Has_Address" THEN
+                      FOREACH v IN s.@entity_list DO
+                        IF t.@entity_map.containsKey(v) THEN
+                          t.@entity_map += (v->Customer_Address_weight)
+                        END
+                      END
+  
+                  WHEN "Has_IP" THEN
+                      FOREACH v IN s.@entity_list DO
+                        IF t.@entity_map.containsKey(v) THEN
+                          t.@entity_map += (v->Customer_IP_weight)
+                        END
+                      END
+  
+                  WHEN "Has_ID" THEN
+                      FOREACH v IN s.@entity_list DO
+                        IF t.@entity_map.containsKey(v) THEN
+                          t.@entity_map += (v->Customer_ID_weight)
+                        END
+                      END
+  
+                  WHEN "Has_Device" THEN
+                      FOREACH v IN s.@entity_list DO
+                        IF t.@entity_map.containsKey(v) THEN
+                          t.@entity_map += (v->Customer_Device_weight)
+                        END
+                      END
+  
+                  WHEN "Application_Has_Party" THEN
+                      FOREACH v IN s.@entity_list DO
+                        IF t.@entity_map.containsKey(v) THEN
+                          t.@entity_map += (v->Customer_Application_weight)
+                        END
+                      END
+  
+                  WHEN "Party_Has_Account" THEN
+                      FOREACH v IN s.@entity_list DO
+                        IF t.@entity_map.containsKey(v) THEN
+                          t.@entity_map += (v->Customer_Account_weight)
+                        END
+                      END
+  
+                  WHEN "Party_Has_Card" THEN
+                      FOREACH v IN s.@entity_list DO
+                        IF t.@entity_map.containsKey(v) THEN
+                          t.@entity_map += (v->Customer_Card_weight)
+                        END
+                      END
+
+                END
+
+              POST-ACCUM
+
+                  FOREACH (k,v) IN t.@entity_map DO
+                    FLOAT full_score = 0.0 + v,
+                    @@max += full_score, @@min += full_score, @@avg += full_score,
+                    IF full_score > (threshold - 0.000001) THEN
+                      INSERT INTO Same_As VALUES (t, k, full_score),
+                      @@count += 1
+                    END
+                  END,
+
+                  t.@entity_map.clear(),
+                  t.@is_candidate = FALSE
+          ;
+  
+      END; // End of target batching
+  
+      cleared_piis = SELECT s
+          FROM piis:s
+          POST-ACCUM
+              s.@entity_list.clear()
+      ;
+  
+  END; // End of source batching
+  
+  DATETIME end_time = now();
+  STRING execution_time = to_string(datetime_diff(end_time, start_time));
+  log(true, "UDF:: match_entities end time: " + datetime_format(end_time));
+  log(true, "UDF:: match_entities execution time (seconds): " + execution_time);
+
+  PRINT to_string(@@count) AS pairs_matched_count,
+      to_string(@@max) AS max_match_score,
+      to_string(@@min) AS min_match_score,
+      to_string(@@avg) AS avg_match_score
+  ;
+  
+  PRINT execution_time AS execution_time_in_seconds;
+
+}

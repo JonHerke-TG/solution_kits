@@ -1,0 +1,15 @@
+CREATE OR REPLACE DISTRIBUTED QUERY delete_all_party_cc_connections(INT num_of_batches = 1, INT batch_id = 0) { 
+
+  SumAccum<INT> @@count;
+  
+  temp = SELECT t
+      FROM Party:s-(Entity_In_Ring:e)->Connected_Component:t
+      WHERE getvid(s)%num_of_batches == batch_id
+      ACCUM @@count+=1,
+      DELETE(e);
+  
+  STRING result = "Deleting " + to_string(@@count) + " Entity_In_Ring edges (batch " + to_string(batch_id) + "/" + to_string(num_of_batches-1) + ")";
+  
+  PRINT result;
+
+}

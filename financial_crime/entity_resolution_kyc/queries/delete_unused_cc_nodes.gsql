@@ -1,0 +1,17 @@
+CREATE OR REPLACE DISTRIBUTED QUERY delete_unused_cc_nodes(INT num_of_batches = 1, INT batch_id = 0) { 
+  
+  SumAccum<INT> @@count;
+  
+  start = {Connected_Component.*};
+  
+  temp = SELECT s
+      FROM start:s
+      WHERE getvid(s)%num_of_batches == batch_id AND s.outdegree() == 0
+      POST-ACCUM @@count +=1,
+      DELETE(s);
+  
+  STRING result = "Deleting " + to_string(@@count) + " unused Connected_Component vertices (batch " + to_string(batch_id) + "/" + to_string(num_of_batches-1) + ")";
+  
+  PRINT result;
+
+}
