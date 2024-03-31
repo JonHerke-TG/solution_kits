@@ -1,1 +1,2 @@
-
+CREATE GRAPH Application_Fraud(Phone, Email, Address, IP, Device, City, Country, State, Full_Name, Zipcode, County, ID, Party, Connected_Component, DOB, Application, Product, Account, Card, Has_Address, Has_ID, Has_IP, Has_Device, Has_Phone, Has_Email, Located_In, Assigned_To_County, Located_In_State, Located_In_Country, Same_As, Entity_In_Ring, Has_DOB, Has_Full_Name, Application_Has_Full_Name, Application_Has_Phone, Application_Has_Email, Application_Has_DOB, Application_Has_ID, Application_Has_Device, Application_Has_IP, Same_Application, Application_Has_Address, Application_In_Ring, Application_Has_Product, Application_Has_Account, Application_Has_Party, Assigned_To, Application_Has_Card)
+set exit_on_error = "false"

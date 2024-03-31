@@ -1,0 +1,162 @@
+CREATE OR REPLACE QUERY get_application_cc_features(VERTEX<Application> application, INT connections=25000) {
+
+  MapAccum<INT, INT> @@connect_component, @@distinct_name, @@distinct_dob, @@distinct_email, @@distinct_phone, @@distinct_address, @@distinct_ip, @@distinct_id, @@distinct_device, @@distinct_party, @@distinct_account, @@distinct_card, @@connected_via_name, @@connected_via_dob, @@connected_via_email, @@connected_via_phone, @@connected_via_address, @@connected_via_ip, @@connected_via_id, @@connected_via_device, @@connected_via_party, @@connected_via_account, @@connected_via_card, @@only_connected_via_name, @@only_connected_via_dob, @@only_connected_via_email, @@only_connected_via_phone, @@only_connected_via_address, @@only_connected_via_ip, @@only_connected_via_id, @@only_connected_via_device, @@only_connected_via_party, @@only_connected_via_account, @@only_connected_via_card;
+  OrAccum @connected_via_name, @connected_via_dob, @connected_via_email, @connected_via_phone, @connected_via_address, @connected_via_ip, @connected_via_id, @connected_via_device, @connected_via_party, @connected_via_account, @connected_via_card;
+  SetAccum<STRING> @middle_type;
+  SetAccum<INT> @comm_ids;
+  MinAccum<INT> @cc_id;       //each vertex's tentative component id
+  SumAccum<INT> @@total_count, @@unified_count;
+  ListAccum<int> @result;
+  SetAccum<STRING> @@edge_type_set = (
+    "Application_Has_Full_Name",
+    "Application_Has_DOB",
+    "Application_Has_Email",
+    "Application_Has_Phone",
+    "Application_Has_Address",
+    "Application_Has_IP",
+    "Application_Has_ID",
+    "Application_Has_Device",
+    "Application_Has_Party",
+    "Application_Has_Account",
+    "Application_Has_Card"
+  );
+  
+  Start(ANY) = {application};
+
+  Start = SELECT t
+          FROM Start:s - (Application_In_Ring) - :t;
+
+  If Start.size() > 0 THEN
+
+    Start = SELECT t
+            FROM Start:s - (Application_In_Ring) - :t
+            ACCUM s.@cc_id += getvid(t);
+
+    Start = SELECT s
+            FROM Start:s - (Application_In_Ring) - :t
+            ACCUM s.@cc_id += t.@cc_id;
+
+      # Calculate the first part
+      Part_one = select s from Start:s -(@@edge_type_set:e)- :t
+                  ACCUM
+                    t.@comm_ids += s.@cc_id
+                  POST-ACCUM
+                    @@connect_component += (s.@cc_id -> 1),
+                    FOREACH comm_id in t.@comm_ids DO
+                      if t.type == "Full_Name" then @@distinct_name += (comm_id->1) end,
+                      if t.type == "DOB" then @@distinct_dob += (comm_id->1) end,
+                      if t.type == "Email" then @@distinct_email += (comm_id->1) end,
+                      if t.type == "Phone" then @@distinct_phone += (comm_id->1) end,
+                      if t.type == "Address" then @@distinct_address += (comm_id->1) end,
+                      if t.type == "IP" then @@distinct_ip += (comm_id->1) end,
+                      if t.type == "ID" then @@distinct_id += (comm_id->1) end,
+                      if t.type == "Device" then @@distinct_device += (comm_id->1) end,
+                      if t.type == "Party" then @@distinct_party += (comm_id->1) end,
+                      if t.type == "Account" then @@distinct_account += (comm_id->1) end,
+                      if t.type == "Card" then @@distinct_card += (comm_id->1) end
+                    END;
+
+      Part_two = select s from Start:s-(@@edge_type_set:e)->:t
+                 where t.outdegree(@@edge_type_set) >= 2 and t.outdegree() < connections
+                 accum
+
+                   s.@middle_type += t.type,
+
+                   if t.type == "Full_Name" then s.@connected_via_name += true end,
+                   if t.type == "DOB" then s.@connected_via_dob += true end,
+                   if t.type == "Email" then s.@connected_via_email += true end,
+                   if t.type == "Phone" then s.@connected_via_phone += true end,
+                   if t.type == "Address" then s.@connected_via_address += true end,
+                   if t.type == "IP" then s.@connected_via_ip += true end,
+                   if t.type == "ID" then s.@connected_via_id += true end,
+                   if t.type == "Device" then s.@connected_via_device += true end,
+                   if t.type == "Party" then s.@connected_via_party += true end,
+                   if t.type == "Account" then s.@connected_via_account += true end,
+                   if t.type == "Card" then s.@connected_via_card += true end
+  
+                post-accum
+  
+                  if s.@connected_via_name then @@connected_via_name += (s.@cc_id->1) end,
+                  IF s.@connected_via_dob then @@connected_via_dob += (s.@cc_id->1) end,
+                  IF s.@connected_via_email then @@connected_via_email += (s.@cc_id->1) end,
+                  IF s.@connected_via_phone then @@connected_via_phone += (s.@cc_id->1) end,
+                  IF s.@connected_via_address then @@connected_via_address += (s.@cc_id->1) end,
+                  IF s.@connected_via_ip then @@connected_via_ip += (s.@cc_id->1) end ,
+                  IF s.@connected_via_id then @@connected_via_id += (s.@cc_id->1) end,
+                  IF s.@connected_via_device then @@connected_via_device += (s.@cc_id->1) end,
+                  IF s.@connected_via_party then @@connected_via_party += (s.@cc_id->1) end,
+                  IF s.@connected_via_account then @@connected_via_account += (s.@cc_id->1) end,
+                  IF s.@connected_via_card then @@connected_via_card += (s.@cc_id->1) end
+                
+                having s.@middle_type.size() ==1;
+
+      Part_three = select s from Part_two:s POST-ACCUM
+
+        IF "Full_Name" in s.@middle_type then @@only_connected_via_name += (s.@cc_id->1) end,
+        IF "DOB" in s.@middle_type then @@only_connected_via_dob += (s.@cc_id->1) end,
+        IF "Email" in s.@middle_type then @@only_connected_via_email += (s.@cc_id->1) end,
+        IF "Phone" in s.@middle_type then @@only_connected_via_phone += (s.@cc_id->1) end,
+        IF "Address" in s.@middle_type then @@only_connected_via_address += (s.@cc_id->1) end,
+        IF "IP" in s.@middle_type then @@only_connected_via_ip += (s.@cc_id->1) end,
+        IF "ID" in s.@middle_type then @@only_connected_via_id += (s.@cc_id->1) end,
+        IF "Device" in s.@middle_type then @@only_connected_via_device += (s.@cc_id->1) end,
+        IF "Party" in s.@middle_type then @@only_connected_via_party += (s.@cc_id->1) end,
+        IF "Account" in s.@middle_type then @@only_connected_via_account += (s.@cc_id->1) end,
+        IF "Card" in s.@middle_type then @@only_connected_via_card += (s.@cc_id->1) end;
+
+      # json output
+      result = Start;
+      PRINT result[result.@cc_id AS connectedComponentID,
+                  @@connect_component.get(result.@cc_id) AS total_cc_nodes,
+
+                  @@distinct_name.get(result.@cc_id) AS name_distinct_in_cc,
+                  @@connected_via_name.get(result.@cc_id) AS name_number_nodes,
+                  @@only_connected_via_name.get(result.@cc_id) AS name_number_nodes_only_connected,
+
+                  @@distinct_dob.get(result.@cc_id) AS dob_distinct_in_cc,
+                  @@connected_via_dob.get(result.@cc_id) AS dob_number_nodes,
+                  @@only_connected_via_dob.get(result.@cc_id) AS dob_number_nodes_only_connected,
+
+                  @@distinct_email.get(result.@cc_id) AS email_distinct_in_cc,
+                  @@connected_via_email.get(result.@cc_id) AS email_number_nodes,
+                  @@only_connected_via_email.get(result.@cc_id) AS email_number_nodes_only_connected,
+        
+                  @@distinct_phone.get(result.@cc_id) AS phone_distinct_in_cc,
+                  @@connected_via_phone.get(result.@cc_id) AS phone_number_nodes,
+                  @@only_connected_via_phone.get(result.@cc_id) AS phone_number_nodes_only_connected,
+        
+                  @@distinct_address.get(result.@cc_id) AS address_distinct_in_cc,
+                  @@connected_via_address.get(result.@cc_id) AS address_number_nodes,
+                  @@only_connected_via_address.get(result.@cc_id) AS address_number_nodes_only_connected,
+        
+                  @@distinct_ip.get(result.@cc_id) AS ip_distinct_in_cc,
+                  @@connected_via_ip.get(result.@cc_id) AS ip_number_nodes,
+                  @@only_connected_via_ip.get(result.@cc_id) AS ip_number_nodes_only_connected,
+        
+                  @@distinct_id.get(result.@cc_id) AS id_distinct_in_cc,
+                  @@connected_via_id.get(result.@cc_id) AS id_number_nodes,
+                  @@only_connected_via_id.get(result.@cc_id) AS id_number_nodes_only_connected,
+        
+                  @@distinct_device.get(result.@cc_id) AS device_distinct_in_cc,
+                  @@connected_via_device.get(result.@cc_id) AS device_number_nodes,
+                  @@only_connected_via_device.get(result.@cc_id) AS device_number_nodes_only_connected,
+        
+                  @@distinct_party.get(result.@cc_id) AS party_distinct_in_cc,
+                  @@connected_via_party.get(result.@cc_id) AS party_number_nodes,
+                  @@only_connected_via_party.get(result.@cc_id) AS party_number_nodes_only_connected,
+        
+                  @@distinct_account.get(result.@cc_id) AS account_distinct_in_cc,
+                  @@connected_via_account.get(result.@cc_id) AS account_number_nodes,
+                  @@only_connected_via_account.get(result.@cc_id) AS account_number_nodes_only_connected,
+
+                  @@distinct_card.get(result.@cc_id) AS card_distinct_in_cc,
+                  @@connected_via_card.get(result.@cc_id) AS card_number_nodes,
+                  @@only_connected_via_card.get(result.@cc_id) AS card_number_nodes_only_connected];
+
+  ELSE
+
+    Print "Connected component not found for Application_ID" AS result;
+
+  END;
+
+}
