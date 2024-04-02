@@ -84,7 +84,7 @@ CREATE OR REPLACE QUERY incremental_party_match(
   
   IF string_not_empty(party) AND created_at_not_null AND string_not_empty(name) AND string_not_empty(party_type) AND string_not_empty(sdob) AND string_not_empty(gender) THEN
 
-    INSERT INTO Party VALUES (party, fraud, gender, dob, party_type, name, datetime_to_epoch(created_at));
+    INSERT INTO Party VALUES (party, fraud, gender, dob, party_type, name, created_at);
   
   ELSE
 

@@ -55,7 +55,7 @@ CREATE OR REPLACE DISTRIBUTED QUERY match_party_entities(
   
       batched_entities = SELECT s
           FROM all_entities:s
-          WHERE getvid(s)%num_of_source_batches == i AND s.created_at > datetime_to_epoch(compute_entities_after_date)
+          WHERE getvid(s)%num_of_source_batches == i AND s.created_at > compute_entities_after_date
       ;
   
       batched_entities = SELECT s
@@ -97,7 +97,7 @@ CREATE OR REPLACE DISTRIBUTED QUERY match_party_entities(
               ACCUM
                 t.@is_candidate += TRUE,
                 FOREACH v IN s.@entity_list DO
-                  IF getvid(v) < getvid(t) OR (v.created_at > datetime_to_epoch(compute_entities_after_date) AND t.created_at < datetime_to_epoch(compute_entities_after_date)) THEN
+                  IF getvid(v) < getvid(t) OR (v.created_at > compute_entities_after_date AND t.created_at < compute_entities_after_date) THEN
                     t.@entity_map += (v->0.0)
                   END
                 END
