@@ -1,0 +1,42 @@
+USE GRAPH Entity_Resolution
+DROP QUERY unify_entities
+CREATE OR REPLACE DISTRIBUTED QUERY unify_entities() FOR GRAPH Entity_Resolution { 
+
+  MinAccum<INT> @cc_id; // Each vertex's tentative component id
+
+  DATETIME start_time = now();
+  log(true, "UDF:: unify_entities start time: " + datetime_format(start_time));
+
+  start = {Entity.*};
+
+  # Initialize: Label each vertex with its own internal ID
+  S = SELECT x
+      FROM start:x
+      POST-ACCUM x.@cc_id = getvid(x)
+  ;
+
+  # Propagate smaller internal IDs until no more ID changes can be done
+  WHILE (S.size()>0) DO
+      S = SELECT t
+          FROM S:s -(Same_As:e)- :t
+          ACCUM t.@cc_id += s.@cc_id // If s has smaller id than t, copy the id to t
+          HAVING t.@cc_id != t.@cc_id';
+  END;
+
+  result = SELECT t
+      FROM start:t
+      POST-ACCUM
+          INSERT INTO Connected_Component VALUES (t.@cc_id),
+          INSERT INTO Entity_In_Ring VALUES (t, t.@cc_id)
+  ;
+
+  DATETIME end_time = now();
+  STRING execution_time = to_string(datetime_diff(end_time, start_time));
+  log(true, "UDF:: unify_entities end time: " + datetime_format(end_time));
+  log(true, "UDF:: unify_entities execution time (seconds): " + execution_time);
+  
+  PRINT execution_time AS execution_time_in_seconds,
+      end_time AS timestamp
+  ;
+  
+}

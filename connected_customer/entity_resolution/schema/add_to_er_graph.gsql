@@ -1,0 +1,73 @@
+DROP QUERY delete_all_cc_connections
+DROP QUERY match_entities
+DROP QUERY unify_entities
+DROP QUERY delete_unused_cc_nodes
+DROP QUERY results_file
+DROP JOB load_data_to_er_graph
+DROP JOB load_hash_to_er_graph
+DROP GRAPH Entity_Resolution
+CREATE GRAPH Entity_Resolution ()
+CREATE SCHEMA_CHANGE JOB add_to_er_graph FOR GRAPH Entity_Resolution {
+  ADD VERTEX Entity (PRIMARY_ID id STRING, created_at DATETIME) WITH primary_id_as_attribute="true";
+  ADD VERTEX Connected_Component (PRIMARY_ID id INT) WITH primary_id_as_attribute="true";
+  ADD VERTEX Account_ABA (PRIMARY_ID id STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX Account_Number (PRIMARY_ID id STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX Birthdate (PRIMARY_ID id STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX Email_Address (PRIMARY_ID id STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX Identification (PRIMARY_ID id STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX Name (PRIMARY_ID id STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX Phone (PRIMARY_ID id STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX Std_Fips_Country (PRIMARY_ID id STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX Std_City (PRIMARY_ID id STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX Std_Latitude (PRIMARY_ID id STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX Std_Longitude (PRIMARY_ID id STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX Std_Postcode (PRIMARY_ID id STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX Std_Prun (PRIMARY_ID id STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX Std_State (PRIMARY_ID id STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX Std_Street_Address (PRIMARY_ID id STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX Tax_Id_Number (PRIMARY_ID id STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX Account_Open_Date (PRIMARY_ID id STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX Source_Customer_Id (PRIMARY_ID id STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX Signal_Id (PRIMARY_ID id STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX Account_Type (PRIMARY_ID id STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX Address_Type (PRIMARY_ID id STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX Source (PRIMARY_ID id STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX Std_Status (PRIMARY_ID id STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX Tax_Id_Type (PRIMARY_ID id STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX Std_Country (PRIMARY_ID id STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX Email_Address_Hash (PRIMARY_ID id STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX Name_Hash (PRIMARY_ID id STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX Phone_Hash (PRIMARY_ID id STRING) WITH primary_id_as_attribute="true";
+  ADD UNDIRECTED EDGE Same_As (From Entity, To Entity, score DOUBLE);
+  ADD UNDIRECTED EDGE Entity_In_Ring (From Entity, To Connected_Component);
+  ADD UNDIRECTED EDGE Customer_Has_Account_ABA (From Entity, To Account_ABA);
+  ADD UNDIRECTED EDGE Customer_Has_Account_Number (From Entity, To Account_Number);
+  ADD UNDIRECTED EDGE Customer_Has_Birthdate (From Entity, To Birthdate);
+  ADD UNDIRECTED EDGE Customer_Has_Email_Address (From Entity, To Email_Address);
+  ADD UNDIRECTED EDGE Customer_Has_Identification (From Entity, To Identification);
+  ADD UNDIRECTED EDGE Customer_Has_Name (From Entity, To Name);
+  ADD UNDIRECTED EDGE Customer_Has_Phone (From Entity, To Phone);
+  ADD UNDIRECTED EDGE Customer_Has_Std_Fips_Country (From Entity, To Std_Fips_Country);
+  ADD UNDIRECTED EDGE Customer_Has_Std_City (From Entity, To Std_City);
+  ADD UNDIRECTED EDGE Customer_Has_Std_Latitude (From Entity, To Std_Latitude);
+  ADD UNDIRECTED EDGE Customer_Has_Std_Longitude (From Entity, To Std_Longitude);
+  ADD UNDIRECTED EDGE Customer_Has_Std_Postcode (From Entity, To Std_Postcode);
+  ADD UNDIRECTED EDGE Customer_Has_Std_Prun (From Entity, To Std_Prun);
+  ADD UNDIRECTED EDGE Customer_Has_Std_State (From Entity, To Std_State);
+  ADD UNDIRECTED EDGE Customer_Has_Std_Street_Address (From Entity, To Std_Street_Address);
+  ADD UNDIRECTED EDGE Customer_Has_Tax_Id_Number (From Entity, To Tax_Id_Number);
+  ADD UNDIRECTED EDGE Customer_Has_Account_Open_Date (From Entity, To Account_Open_Date);
+  ADD UNDIRECTED EDGE Customer_Has_Source_Customer_Id (From Entity, To Source_Customer_Id);
+  ADD UNDIRECTED EDGE Customer_Has_Signal_Id (From Entity, To Signal_Id);
+  ADD UNDIRECTED EDGE Customer_Has_Account_Type (From Entity, To Account_Type);
+  ADD UNDIRECTED EDGE Customer_Has_Address_Type (From Entity, To Address_Type);
+  ADD UNDIRECTED EDGE Customer_Has_Source (From Entity, To Source);
+  ADD UNDIRECTED EDGE Customer_Has_Std_Status (From Entity, To Std_Status);
+  ADD UNDIRECTED EDGE Customer_Has_Tax_Id_Type (From Entity, To Tax_Id_Type);
+  ADD UNDIRECTED EDGE Customer_Has_Std_Country (From Entity, To Std_Country);  
+  ADD UNDIRECTED EDGE Customer_Has_Email_Address_Hash (From Entity, To Email_Address_Hash);
+  ADD UNDIRECTED EDGE Customer_Has_Name_Hash (From Entity, To Name_Hash);
+  ADD UNDIRECTED EDGE Customer_Has_Phone_Hash (From Entity, To Phone_Hash);
+}
+RUN SCHEMA_CHANGE JOB add_to_er_graph
+DROP JOB add_to_er_graph

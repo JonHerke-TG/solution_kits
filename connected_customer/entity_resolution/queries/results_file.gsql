@@ -1,0 +1,18 @@
+USE GRAPH Entity_Resolution
+DROP QUERY results_file
+CREATE OR REPLACE DISTRIBUTED QUERY results_file(STRING output_file= "/home/tigergraph/gsql_output/er_output.txt") FOR GRAPH Entity_Resolution { 
+  
+  FILE f (output_file);
+  
+  f.println("Entity", "Connected_Component");
+  
+  E = {Entity.*};
+  
+  CC = SELECT cc
+      FROM E:s-(Entity_In_Ring:e)-Connected_Component:cc
+      ACCUM f.println(s.id, cc.id)
+  ;
+  
+  PRINT "Results file created!" AS result;
+  
+}

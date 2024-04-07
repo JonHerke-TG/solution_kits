@@ -1,0 +1,58 @@
+USE GRAPH Entity_Resolution
+DROP JOB load_data_to_er_graph
+CREATE LOADING JOB load_data_to_er_graph FOR GRAPH Entity_Resolution {
+  DEFINE FILENAME data_source = "/home/tigergraph/tigergraph/er_test_data_100k_rows.csv";
+  LOAD data_source TO VERTEX Entity VALUES(gsql_concat($"account_aba",$"account_number",$"signalid"), get_dt_now("")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO VERTEX Account_ABA VALUES(gsql_trim($"account_aba")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO VERTEX Account_Number VALUES(gsql_trim($"account_number")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO VERTEX Birthdate VALUES(gsql_trim($"birthdate")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO VERTEX Email_Address VALUES(gsql_trim($"emailaddress")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO VERTEX Identification VALUES(gsql_trim($"identification")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO VERTEX Name VALUES(gsql_upper(gsql_trim($"name"))) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO VERTEX Phone VALUES(gsql_trim($"phone")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO VERTEX Std_Fips_Country VALUES(gsql_trim($"std_fipscounty")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO VERTEX Std_City VALUES(gsql_trim($"std_city")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO VERTEX Std_Latitude VALUES(gsql_trim($"std_latitude")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO VERTEX Std_Longitude VALUES(gsql_trim($"std_longitude")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO VERTEX Std_Postcode VALUES(gsql_trim($"std_postcode")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO VERTEX Std_Prun VALUES(gsql_trim($"std_prun")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO VERTEX Std_State VALUES(gsql_trim($"std_state")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO VERTEX Std_Street_Address VALUES(gsql_trim($"std_streetaddr1")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO VERTEX Tax_Id_Number VALUES(gsql_trim($"taxid_number")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO VERTEX Account_Open_Date VALUES(gsql_trim($"account_opendate")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO VERTEX Source_Customer_Id VALUES(gsql_trim($"sourcecustomerid")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO VERTEX Signal_Id VALUES(gsql_trim($"signalid")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO VERTEX Account_Type VALUES(gsql_trim($"account_type")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO VERTEX Address_Type VALUES(gsql_trim($"addresstype")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO VERTEX Source VALUES(gsql_trim($"source")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO VERTEX Std_Status VALUES(gsql_trim($"std_status")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO VERTEX Tax_Id_Type VALUES(gsql_trim($"taxid_type")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO VERTEX Std_Country VALUES(gsql_trim($"std_country")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO EDGE Customer_Has_Account_ABA VALUES(gsql_concat($"account_aba",$"account_number",$"signalid"), gsql_trim($"account_aba")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO EDGE Customer_Has_Account_Number VALUES(gsql_concat($"account_aba",$"account_number",$"signalid"), gsql_trim($"account_number")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO EDGE Customer_Has_Birthdate VALUES(gsql_concat($"account_aba",$"account_number",$"signalid"), gsql_trim($"birthdate")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO EDGE Customer_Has_Email_Address VALUES(gsql_concat($"account_aba",$"account_number",$"signalid"), gsql_trim($"emailaddress")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO EDGE Customer_Has_Identification VALUES(gsql_concat($"account_aba",$"account_number",$"signalid"), gsql_trim($"identification")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO EDGE Customer_Has_Name VALUES(gsql_concat($"account_aba",$"account_number",$"signalid"), gsql_upper(gsql_trim($"name"))) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO EDGE Customer_Has_Phone VALUES(gsql_concat($"account_aba",$"account_number",$"signalid"), gsql_trim($"phone")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO EDGE Customer_Has_Std_Fips_Country VALUES(gsql_concat($"account_aba",$"account_number",$"signalid"), gsql_trim($"std_fipscounty")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO EDGE Customer_Has_Std_City VALUES(gsql_concat($"account_aba",$"account_number",$"signalid"), gsql_trim($"std_city")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO EDGE Customer_Has_Std_Latitude VALUES(gsql_concat($"account_aba",$"account_number",$"signalid"), gsql_trim($"std_latitude")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO EDGE Customer_Has_Std_Longitude VALUES(gsql_concat($"account_aba",$"account_number",$"signalid"), gsql_trim($"std_longitude")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO EDGE Customer_Has_Std_Postcode VALUES(gsql_concat($"account_aba",$"account_number",$"signalid"), gsql_trim($"std_postcode")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO EDGE Customer_Has_Std_Prun VALUES(gsql_concat($"account_aba",$"account_number",$"signalid"), gsql_trim($"std_prun")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO EDGE Customer_Has_Std_State VALUES(gsql_concat($"account_aba",$"account_number",$"signalid"), gsql_trim($"std_state")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO EDGE Customer_Has_Std_Street_Address VALUES(gsql_concat($"account_aba",$"account_number",$"signalid"), gsql_trim($"std_streetaddr1")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO EDGE Customer_Has_Tax_Id_Number VALUES(gsql_concat($"account_aba",$"account_number",$"signalid"), gsql_trim($"taxid_number")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO EDGE Customer_Has_Account_Open_Date VALUES(gsql_concat($"account_aba",$"account_number",$"signalid"), gsql_trim($"account_opendate")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO EDGE Customer_Has_Source_Customer_Id VALUES(gsql_concat($"account_aba",$"account_number",$"signalid"), gsql_trim($"sourcecustomerid")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO EDGE Customer_Has_Signal_Id VALUES(gsql_concat($"account_aba",$"account_number",$"signalid"), gsql_trim($"signalid")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO EDGE Customer_Has_Account_Type VALUES(gsql_concat($"account_aba",$"account_number",$"signalid"), gsql_trim($"account_type")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO EDGE Customer_Has_Address_Type VALUES(gsql_concat($"account_aba",$"account_number",$"signalid"), gsql_trim($"addresstype")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO EDGE Customer_Has_Source VALUES(gsql_concat($"account_aba",$"account_number",$"signalid"), gsql_trim($"source")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO EDGE Customer_Has_Std_Status VALUES(gsql_concat($"account_aba",$"account_number",$"signalid"), gsql_trim($"std_status")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO EDGE Customer_Has_Tax_Id_Type VALUES(gsql_concat($"account_aba",$"account_number",$"signalid"), gsql_trim($"taxid_type")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+  LOAD data_source TO EDGE Customer_Has_Std_Country VALUES(gsql_concat($"account_aba",$"account_number",$"signalid"), gsql_trim($"std_country")) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+}
+
+# RUN LOADING JOB load_data_to_er_graph USING data_source="/home/tigergraph/tigergraph/er_test_data_100k_rows.csv"

@@ -1,0 +1,305 @@
+USE GRAPH Entity_Resolution
+DROP QUERY match_entities
+CREATE OR REPLACE DISTRIBUTED QUERY match_entities(
+  FLOAT customer_has_birthdate_weight = 0.2,
+  FLOAT customer_has_email_address_weight = 0.2,
+  FLOAT customer_has_name_weight = 0.2,
+  FLOAT customer_has_phone_weight = 0.2,
+  FLOAT customer_has_std_city_weight = 0.2,
+  FLOAT customer_has_std_postcode_weight = 0.2,
+  FLOAT customer_has_std_state_weight = 0.2,
+  FLOAT customer_has_std_street_address_weight = 0.2,
+  FLOAT customer_has_tax_id_number_weight = 0.2,
+  FLOAT customer_has_source_customer_id_weight = 0.2,
+  INT num_of_source_batches = 10, // number of source batches
+  INT num_of_target_batches = 1, // number of target batches
+  FLOAT threshold = 1, // if a total matching score between two entities exceed the threshold, a similarity edge will be created between the matching entities
+  INT pii_low_connections_limit = 100, // maximum out degree of an attribute. The case will be skipped if the same attribute is connected to too many entities
+  INT pii_high_connections_limit = 25000, // maximum out degree of an attribute. The case will be skipped if the same attribute is connected to too many entities
+  DATETIME compute_entities_after_date = to_datetime("1970-01-01 00:00:00") // All entities that were created in TG after this date, will be computed to find similarity edges related to these new entities. The default value is the earliest time possible (great for the first time running this query)
+) FOR GRAPH Entity_Resolution {
+
+  TYPEDEF TUPLE<ver VERTEX<Entity>, str STRING, created_at DATETIME> entity_fuzzy_vertex_info;
+  ListAccum<entity_fuzzy_vertex_info> @entity_email_address_list;
+  ListAccum<entity_fuzzy_vertex_info> @entity_name_list;
+  ListAccum<entity_fuzzy_vertex_info> @entity_phone_list;
+  SumAccum<STRING> @entity_email_address_sum;
+  SumAccum<STRING> @entity_name_sum;
+  SumAccum<STRING> @entity_phone_sum;
+  MapAccum<VERTEX<Entity>, MaxAccum<FLOAT>> @entity_email_address_max_map;
+  MapAccum<VERTEX<Entity>, MaxAccum<FLOAT>> @entity_name_max_map;
+  MapAccum<VERTEX<Entity>, MaxAccum<FLOAT>> @entity_phone_max_map;
+  ListAccum<VERTEX<Entity>> @entity_list;
+  MapAccum<VERTEX<Entity>,FLOAT> @entity_map;
+  SumAccum<INT> @@count;
+  MaxAccum<FLOAT> @@max;
+  MinAccum<FLOAT> @@min;
+  AvgAccum @@avg;
+  SetAccum<STRING> @@edge_type_set;
+  OrAccum @is_candidate;
+
+  /* PII connections that are used in this ER solution */
+  @@edge_type_set = (
+    "Customer_Has_Birthdate",
+    "Customer_Has_Std_City",
+    "Customer_Has_Std_Postcode",
+    "Customer_Has_Std_State",
+    "Customer_Has_Std_Street_Address",
+    "Customer_Has_Tax_Id_Number",
+    "Customer_Has_Source_Customer_Id",
+    "Customer_Has_Email_Address_Hash",
+    "Customer_Has_Name_Hash",
+    "Customer_Has_Phone_Hash"
+  );
+
+  DATETIME start_time = now();
+  log(true, "UDF:: match_entities start time: " + datetime_format(start_time));
+
+  all_entities = {Entity.*};
+  
+  /* Prepare for fuzzy matching (score-based matching).
+  Store the original PII values on the entities (to have them available for calculation later when iterating through the MinHash connections). */
+  
+  fuzzy_prep = SELECT s
+      FROM all_entities:s-(Customer_Has_Email_Address:e)->:t
+      ACCUM s.@entity_email_address_sum += t.id;
+
+  fuzzy_prep = SELECT s
+      FROM all_entities:s-(Customer_Has_Name:e)->:t
+      ACCUM s.@entity_name_sum += t.id;
+
+  fuzzy_prep = SELECT s
+      FROM all_entities:s-(Customer_Has_Phone:e)->:t
+      ACCUM s.@entity_phone_sum += t.id;
+
+  /* Batching source entities */
+  
+  FOREACH i IN RANGE[0, num_of_source_batches-1] DO
+
+      /* Prepare the source batched entitities */
+  
+      batched_entities = SELECT s
+          FROM all_entities:s
+          WHERE getvid(s)%num_of_source_batches == i AND s.created_at > compute_entities_after_date
+      ;
+  
+      batched_entities = SELECT s
+          FROM batched_entities:s-(@@edge_type_set:e)->:t
+          WHERE t.outdegree() > 1 AND t.outdegree() < pii_low_connections_limit
+      ;
+  
+      /* Prepare the low-degree PIIs that are connected to the source batched entitities */
+  
+      low_degree_piis = SELECT t
+          FROM batched_entities:s-(@@edge_type_set:e)->:t
+          WHERE t.outdegree() > 1 AND t.outdegree() < pii_low_connections_limit
+      ;
+  
+      /* For each high-degree PII that is connected to the relevant source batched entities,
+      save a list of all source batched entities on that PII */
+
+      piis = SELECT t
+          FROM batched_entities:s-(@@edge_type_set:e)->:t
+          WHERE t.outdegree(@@edge_type_set) > 1 AND t.outdegree() < pii_high_connections_limit
+          ACCUM
+            CASE e.type
+
+              WHEN "Customer_Has_Email_Address_Hash" THEN
+                t.@entity_email_address_list += entity_fuzzy_vertex_info(s, s.@entity_email_address_sum, s.created_at)
+
+              WHEN "Customer_Has_Name_Hash" THEN
+                t.@entity_name_list += entity_fuzzy_vertex_info(s, s.@entity_name_sum, s.created_at)
+
+              WHEN "Customer_Has_Phone_Hash" THEN
+                t.@entity_phone_list += entity_fuzzy_vertex_info(s, s.@entity_phone_sum, s.created_at)
+
+              ELSE
+                t.@entity_list += s
+
+            END
+      ;
+      
+      /* Batching target entities (nested batching) */
+  
+      FOREACH j IN RANGE[0, num_of_target_batches-1] DO
+  
+          /* Mapping the potential matches:
+          For each relevant low-degree PII (that is connected to the source batched entities),
+          check the target batched entities.
+          If there is a potential match (a PII in common between entities),
+          then save a key-value pair on the relevant entity
+          (where the key is the ID of the other similar entity and the value is the initial similarity score of 0).*/
+          
+          mapped_candidates = SELECT t
+              FROM low_degree_piis:s-(@@edge_type_set:e)->Entity:t
+              WHERE getvid(t)%num_of_target_batches == j
+              ACCUM
+                t.@is_candidate += TRUE,
+                CASE e.type
+    
+                  WHEN "Customer_Has_Email_Address_Hash" THEN
+                      FOREACH tup IN s.@entity_email_address_list DO
+                        IF getvid(tup.ver) < getvid(t) OR (tup.created_at > compute_entities_after_date AND t.created_at < compute_entities_after_date) THEN
+                          t.@entity_map += (tup.ver->0.0)
+                        END
+                      END
+    
+                  WHEN "Customer_Has_Name_Hash" THEN
+                      FOREACH tup IN s.@entity_name_list DO
+                        IF getvid(tup.ver) < getvid(t) OR (tup.created_at > compute_entities_after_date AND t.created_at < compute_entities_after_date) THEN
+                          t.@entity_map += (tup.ver->0.0)
+                        END
+                      END
+    
+                  WHEN "Customer_Has_Phone_Hash" THEN
+                      FOREACH tup IN s.@entity_phone_list DO
+                        IF getvid(tup.ver) < getvid(t) OR (tup.created_at > compute_entities_after_date AND t.created_at < compute_entities_after_date) THEN
+                          t.@entity_map += (tup.ver->0.0)
+                        END
+                      END
+      
+                  ELSE
+                      FOREACH v IN s.@entity_list DO
+                        IF getvid(v) < getvid(t) OR (v.created_at > compute_entities_after_date AND t.created_at < compute_entities_after_date) THEN
+                          t.@entity_map += (v->0.0)
+                        END
+                      END
+    
+                END
+          ;
+
+          /* Evaluate the potential matches (calculating similarity scores),
+          and insert the similarity edges between the similar entities.*/
+
+          evaluated_matches = SELECT t
+              FROM piis:s-(@@edge_type_set:e)->Entity:t
+              WHERE getvid(t)%num_of_target_batches == j AND t.@is_candidate == TRUE
+              ACCUM
+                CASE e.type
+    
+                  WHEN "Customer_Has_Birthdate" THEN
+                      FOREACH v IN s.@entity_list DO
+                        IF t.@entity_map.containsKey(v) THEN
+                          t.@entity_map += (v->customer_has_birthdate_weight)
+                        END
+                      END
+    
+                  WHEN "Customer_Has_Email_Address_Hash" THEN
+                      FOREACH tup IN s.@entity_email_address_list DO
+                        IF t.@entity_map.containsKey(tup.ver) THEN
+                          t.@entity_email_address_max_map += (tup.ver->customer_has_email_address_weight * jaroWinklerDistance(t.@entity_email_address_sum, tup.str))
+                        END
+                      END
+    
+                  WHEN "Customer_Has_Name_Hash" THEN
+                      FOREACH tup IN s.@entity_name_list DO
+                        IF t.@entity_map.containsKey(tup.ver) THEN
+                          t.@entity_name_max_map += (tup.ver->customer_has_name_weight * jaroWinklerDistance(t.@entity_name_sum, tup.str))
+                        END
+                      END
+    
+                  WHEN "Customer_Has_Phone_Hash" THEN
+                      FOREACH tup IN s.@entity_phone_list DO
+                        IF t.@entity_map.containsKey(tup.ver) THEN
+                          t.@entity_phone_max_map += (tup.ver->customer_has_phone_weight * jaroWinklerDistance(t.@entity_phone_sum, tup.str))
+                        END
+                      END
+    
+                  WHEN "Customer_Has_Std_City" THEN
+                      FOREACH v IN s.@entity_list DO
+                        IF t.@entity_map.containsKey(v) THEN
+                          t.@entity_map += (v->customer_has_std_city_weight)
+                        END
+                      END
+    
+                  WHEN "Customer_Has_Std_Postcode" THEN
+                      FOREACH v IN s.@entity_list DO
+                        IF t.@entity_map.containsKey(v) THEN
+                          t.@entity_map += (v->customer_has_std_postcode_weight)
+                        END
+                      END
+    
+                  WHEN "Customer_Has_Std_State" THEN
+                      FOREACH v IN s.@entity_list DO
+                        IF t.@entity_map.containsKey(v) THEN
+                          t.@entity_map += (v->customer_has_std_state_weight)
+                        END
+                      END
+    
+                  WHEN "Customer_Has_Std_Street_Address" THEN
+                      FOREACH v IN s.@entity_list DO
+                        IF t.@entity_map.containsKey(v) THEN
+                          t.@entity_map += (v->customer_has_std_street_address_weight)
+                        END
+                      END
+
+                  WHEN "Customer_Has_Tax_Id_Number" THEN
+                      FOREACH v IN s.@entity_list DO
+                        IF t.@entity_map.containsKey(v) THEN
+                          t.@entity_map += (v->customer_has_tax_id_number_weight)
+                        END
+                      END
+
+                  WHEN "Customer_Has_Source_Customer_Id" THEN
+                      FOREACH v IN s.@entity_list DO
+                        IF t.@entity_map.containsKey(v) THEN
+                          t.@entity_map += (v->customer_has_source_customer_id_weight)
+                        END
+                      END
+
+                END
+
+              POST-ACCUM
+
+                  FOREACH (k,v) IN t.@entity_map DO
+                    FLOAT full_score = 0.0 + v,
+                    IF t.@entity_email_address_max_map.containsKey(k) THEN  
+                      full_score = full_score + t.@entity_email_address_max_map.get(k)
+                    END,
+                    IF t.@entity_name_max_map.containsKey(k) THEN  
+                      full_score = full_score + t.@entity_name_max_map.get(k)
+                    END,
+                    IF t.@entity_phone_max_map.containsKey(k) THEN  
+                      full_score = full_score + t.@entity_phone_max_map.get(k)
+                    END,
+                    @@max += full_score, @@min += full_score, @@avg += full_score,
+                    IF full_score > (threshold - 0.000001) THEN
+                      INSERT INTO Same_As VALUES (t, k, full_score),
+                      @@count += 1
+                    END
+                  END,
+
+                  t.@entity_email_address_max_map.clear(),
+                  t.@entity_name_max_map.clear(),
+                  t.@entity_phone_max_map.clear(),
+                  t.@entity_map.clear(),
+                  t.@is_candidate = FALSE
+          ;
+  
+      END; // End of target batching
+  
+      cleared_piis = SELECT s
+          FROM piis:s
+          POST-ACCUM
+              s.@entity_email_address_list.clear(),
+              s.@entity_name_list.clear(),
+              s.@entity_phone_list.clear(),
+              s.@entity_list.clear()
+      ;
+  
+  END; // End of source batching
+  
+  DATETIME end_time = now();
+  STRING execution_time = to_string(datetime_diff(end_time, start_time));
+  log(true, "UDF:: match_entities end time: " + datetime_format(end_time));
+  log(true, "UDF:: match_entities execution time (seconds): " + execution_time);
+
+  PRINT to_string(@@count) AS pairs_matched_count,
+      to_string(@@max) AS max_match_score,
+      to_string(@@min) AS min_match_score,
+      to_string(@@avg) AS avg_match_score
+  ;
+  
+  PRINT execution_time AS execution_time_in_seconds;
+
+}

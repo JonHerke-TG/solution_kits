@@ -1,0 +1,21 @@
+USE GRAPH Entity_Resolution
+DROP QUERY delete_unused_cc_nodes
+CREATE OR REPLACE DISTRIBUTED QUERY delete_unused_cc_nodes(INT num_of_batches = 20, INT batch_id = 0) FOR GRAPH Entity_Resolution { 
+  
+  SumAccum<INT> @@count;
+  
+  start = {Connected_Component.*};
+  
+  temp = SELECT s
+      FROM start:s
+      WHERE getvid(s)%num_of_batches == batch_id AND s.outdegree() == 0
+      POST-ACCUM @@count +=1,
+      DELETE(s);
+  
+  STRING result = "Deleting " + to_string(@@count) + " unused Connected_Component vertices (batch " + to_string(batch_id) + "/" + to_string(num_of_batches-1) + ")";
+  
+  PRINT result;
+
+}
+
+// for i in {0..49};do curl -X GET "http://<IP_ADDRESS>:9000/query/Entity_Resolution/delete_unused_cc_nodes?num_of_batches=50&batch_id=${i}";done;
