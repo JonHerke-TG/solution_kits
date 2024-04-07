@@ -1,0 +1,45 @@
+CREATE OR REPLACE QUERY distance_and_path_to_fraud_party(VERTEX<Party> input, INT depth=5) {
+
+  MinAccum<INT> @dis;
+  OrAccum @visited;
+  SetAccum<VERTEX<Party>> @@fraud_party;
+  ListAccum<STRING> @path_of_connection;
+  SetAccum<STRING> @@edge_type_set = (
+    "Has_Full_Name",
+    "Has_DOB",
+    "Has_Email",
+    "Has_Phone",
+    "Has_Address",
+    "Has_IP",
+    "Has_ID",
+    "Has_Device",
+    "Application_Has_Party",
+    "Party_Has_Account",
+    "Party_Has_Card"
+  );
+
+  Start={input};
+
+   ##### Initialization
+  Start (ANY) = SELECT s FROM Start:s
+                POST-ACCUM s.@visited += True, s.@dis = 0;
+
+   ##### Calculate  distance
+
+  WHILE Start.size() > 0 limit depth DO
+
+    Start = SELECT t FROM Start:s - (@@edge_type_set) - :t
+            where t.@visited == FALSE
+            ACCUM t.@dis += s.@dis + 1, t.@path_of_connection += s.type
+            post-accum
+              t.@visited += TRUE,
+              if t.type == "Party" and t.is_fraud == 1 then @@fraud_party += t end;
+
+  END;
+
+  ##### print fraud account
+  result={@@fraud_party};
+
+  //print L2[L2.application_id];
+  print result[result.@dis as degree_of_connection, result.is_fraud as is_fraud, result.id as party_id, result.@path_of_connection as path_of_connection];
+}

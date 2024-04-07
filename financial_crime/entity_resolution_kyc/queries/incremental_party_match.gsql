@@ -1,0 +1,432 @@
+CREATE OR REPLACE QUERY incremental_party_match(
+  STRING input,
+  FLOAT Customer_Full_Name_weight = 0.2,
+  FLOAT Customer_DOB_weight = 0.2,
+  FLOAT Customer_Email_weight = 0.2,
+  FLOAT Customer_Phone_weight = 0.2,
+  FLOAT Customer_Address_weight = 0.2,
+  FLOAT Customer_IP_weight = 0.2,
+  FLOAT Customer_ID_weight = 1.0,
+  FLOAT Customer_Device_weight = 1.0,
+  FLOAT Customer_Application_weight = 1.0,
+  FLOAT Customer_Account_weight = 1.0,
+  FLOAT Customer_Card_weight = 1.0,
+  FLOAT threshold = 1.0 // if a total matching score between two entities exceed the threshold, a similarity edge will be created between the matching entities
+) {
+
+  TYPEDEF TUPLE<FLOAT score, VERTEX<Connected_Component> ver> Connected_Component_heap_tuple;
+  HeapAccum<Connected_Component_heap_tuple>(1, score DESC) @@Connected_Component_ID_heap;
+  SetAccum<STRING> @@edge_type_set, @@party_vertex, @@name, @@dob, @@email, @@phone_numbers, @@addresses, @@ip, @@ids, @@device, @@applications, @@accounts, @@cards;
+  SetAccum<VERTEX> @@exact_match_map, @@party_set;
+  MapAccum<VERTEX<Connected_Component>, FLOAT> @@score_map;
+  SumAccum<FLOAT> @score;
+  STRING party, created, name, party_type, gender, sdob;
+  BOOL erv, created_at_not_null;
+  DATETIME created_at, dob, default_dt;
+  INT fraud;
+  EXCEPTION invalid_input_data (40001);
+
+  JSONOBJECT jobj = parse_json_object(input);
+
+  IF jobj.containsKey("party") THEN
+
+    party = jobj.getString("party");
+
+  END;
+  
+  IF jobj.containsKey("created_at") THEN
+
+    created = jobj.getString("created_at");
+
+    IF string_not_empty(created) THEN
+
+      created_at = to_datetime(created);
+  
+      IF created_at > default_dt THEN 
+  
+        created_at_not_null = True;
+  
+      END;
+
+    END;
+
+  END;
+
+  IF jobj.containsKey("name") THEN
+
+    name = jobj.getString("name");
+
+  END;
+
+  IF jobj.containsKey("party_type") THEN
+
+    party_type = jobj.getString("party_type");
+
+  END;
+
+  IF jobj.containsKey("gender") THEN
+
+    gender = jobj.getString("gender");
+
+  END;
+  
+  IF jobj.containsKey("dob") THEN
+
+    sdob = jobj.getString("dob");
+
+  END;
+
+  IF jobj.containsKey("fraud") THEN
+
+    fraud = jobj.getInt("fraud");
+
+  END;
+  
+  IF string_not_empty(party) AND created_at_not_null AND string_not_empty(name) AND string_not_empty(party_type) AND string_not_empty(sdob) AND string_not_empty(gender) THEN
+
+    INSERT INTO Party VALUES (party, fraud, gender, dob, party_type, name, created_at);
+  
+  ELSE
+
+    RAISE invalid_input_data ("Invalid party input data encountered");
+  
+  END;
+
+  IF jobj.containsKey("name") THEN
+
+    STRING name = upper(jobj.getString("name"));
+    
+    IF string_not_empty(name) THEN
+
+      INSERT INTO Has_Full_Name VALUES (party, name);
+
+      @@name += name;
+      @@exact_match_map += to_vertex_set(@@name, "Full_Name");
+      @@edge_type_set += "Has_Full_Name";
+  
+    ELSE
+
+      RAISE invalid_input_data ("Invalid name input data encountered");
+  
+    END;
+
+  END;
+
+  IF jobj.containsKey("dob") THEN
+
+    STRING sdob = jobj.getString("dob");
+
+    IF string_not_empty(sdob) THEN
+  
+      INSERT INTO Has_DOB VALUES (party, sdob);
+
+      @@dob += sdob;
+      @@exact_match_map += to_vertex_set(@@dob, "DOB");
+      @@edge_type_set += "Has_DOB";
+  
+    ELSE
+
+      RAISE invalid_input_data ("Invalid dob input data encountered");
+  
+    END;
+
+  END;
+
+  IF jobj.containsKey("email") THEN
+
+    STRING email = upper(jobj.getString("email"));
+  
+    IF string_not_empty(email) THEN
+
+      INSERT INTO Has_Email VALUES (party, email);
+
+      @@email += email;
+      @@exact_match_map += to_vertex_set(@@email, "Email");
+      @@edge_type_set += "Has_Email";
+  
+    ELSE
+
+      RAISE invalid_input_data ("Invalid email input data encountered");
+
+    END;
+
+  END;
+  
+  IF jobj.containsKey("phone_numbers") THEN
+
+    JSONARRAY phoneja = jobj.getJsonArray("phone_numbers");
+    FOREACH i IN RANGE[0, phoneja.size() - 1] DO
+  
+      JSONOBJECT phoneobj = phoneja.getJsonObject(i);
+      STRING phoneid = upper(phoneobj.getString("id"));
+      STRING phonetype = upper(phoneobj.getString("type"));
+  
+      IF string_not_empty(phoneid) AND string_not_empty(phonetype) THEN
+  
+        INSERT INTO Has_Phone VALUES (party, phoneid);
+        @@phone_numbers += phoneid;
+  
+      ELSE
+
+        RAISE invalid_input_data ("Invalid phone number input data encountered");
+  
+      END;
+
+    END;
+  
+    @@exact_match_map += to_vertex_set(@@phone_numbers, "Phone");
+    @@edge_type_set += "Has_Phone";
+
+  END;
+  
+  IF jobj.containsKey("addresses") THEN
+
+    JSONARRAY adrja = jobj.getJsonArray("addresses");
+    FOREACH i IN RANGE[0, adrja.size() - 1] DO
+  
+      JSONOBJECT adrobj = adrja.getJsonObject(i);
+      STRING adr1 = upper(adrobj.getString("line_1"));
+      STRING adr2 = upper(adrobj.getString("line_2"));
+      STRING adrcity = upper(adrobj.getString("city"));
+      STRING adrstate = upper(adrobj.getString("state"));
+      STRING adrzipcode = upper(adrobj.getString("zipcode"));
+      STRING adrcounty = upper(adrobj.getString("county"));
+      STRING adrcountry = upper(adrobj.getString("country"));
+  
+      IF string_not_empty(adr1) AND string_not_empty(adrcity) AND string_not_empty(adrstate) AND string_not_empty(adrzipcode) AND string_not_empty(adrcounty) AND string_not_empty(adrcountry) THEN
+        
+        STRING adraddress;
+  
+        IF string_not_empty(adr2) THEN 
+  
+          adraddress = adr1 + " " + adr2 + " " + adrcity + " " + adrstate + " " + adrzipcode + " " + adrcounty + " " + adrcountry;
+  
+        ELSE
+  
+          adraddress = adr1 + " " + adrcity + " " + adrstate + " " + adrzipcode + " " + adrcounty + " " + adrcountry;
+  
+        END;
+        
+        INSERT INTO Has_Address VALUES (party, adraddress);
+        INSERT INTO Assigned_To VALUES (adraddress Address, adrzipcode Zipcode);
+        INSERT INTO Assigned_To VALUES (adrzipcode Zipcode, adrcity City);
+        INSERT INTO Located_In VALUES (adraddress Address, adrcity City);
+        INSERT INTO Located_In VALUES (adrcity City, adrstate State);
+        INSERT INTO Located_In_Country VALUES (adrcountry, adrstate);
+        INSERT INTO Located_In_State VALUES (adrstate, adrcounty);
+        INSERT INTO Assigned_To_County VALUES (adrcounty, adrzipcode);
+        @@addresses += adraddress;
+  
+      ELSE
+  
+        RAISE invalid_input_data ("Invalid address input data encountered");
+  
+      END;
+  
+    END;
+  
+    @@exact_match_map += to_vertex_set(@@addresses, "Address");
+    @@edge_type_set += "Has_Address";
+
+  END;
+
+  IF jobj.containsKey("ip_address") THEN
+
+    STRING ip = jobj.getString("ip_address");
+  
+    IF string_not_empty(ip) THEN
+
+        INSERT INTO Has_IP VALUES (party, ip);
+
+        @@ip += ip;
+        @@exact_match_map += to_vertex_set(@@ip, "IP");
+        @@edge_type_set += "Has_IP";
+  
+    ELSE
+
+      RAISE invalid_input_data ("Invalid ip input data encountered");
+
+    END;
+
+  END;
+
+  IF jobj.containsKey("ids") THEN
+
+    JSONARRAY idsja = jobj.getJsonArray("ids");
+    FOREACH i IN RANGE[0, idsja.size() - 1] DO
+  
+      JSONOBJECT idsobj = idsja.getJsonObject(i);
+      STRING idsid = upper(idsobj.getString("id"));
+      STRING idstype = upper(idsobj.getString("type"));
+  
+      IF string_not_empty(idsid) AND string_not_empty(idstype) THEN
+  
+        INSERT INTO ID VALUES (idsid, idstype);
+        INSERT INTO Has_ID VALUES (party, idsid);
+        @@ids += idsid;
+
+      ELSE
+
+        RAISE invalid_input_data ("Invalid id input data encountered");
+
+      END;
+  
+    END;
+  
+    @@exact_match_map += to_vertex_set(@@ids, "ID");
+    @@edge_type_set += "Has_ID";
+
+  END;
+  
+  IF jobj.containsKey("device_id") THEN
+
+    STRING device = jobj.getString("device_id");
+  
+    IF string_not_empty(device) THEN
+
+        INSERT INTO Has_Device VALUES (party, device);
+
+        @@device += device;
+        @@exact_match_map += to_vertex_set(@@device, "Device");
+        @@edge_type_set += "Has_Device";
+  
+    ELSE
+
+      RAISE invalid_input_data ("Invalid device input data encountered");
+
+    END;
+
+  END;
+
+  IF jobj.containsKey("application") THEN
+
+    STRING application = jobj.getString("application");
+  
+    IF string_not_empty(application) THEN
+
+        INSERT INTO Application_Has_Party VALUES (application, party);
+
+        @@applications += application;
+        @@exact_match_map += to_vertex_set(@@applications, "Application");
+        @@edge_type_set += "Application_Has_Party";
+  
+    ELSE
+
+      RAISE invalid_input_data ("Invalid application input data encountered");
+
+    END;
+
+  END;
+
+  IF jobj.containsKey("accounts") THEN
+
+    JSONARRAY accountsja = jobj.getJsonArray("accounts");
+    FOREACH i IN RANGE[0, accountsja.size() - 1] DO
+  
+      JSONOBJECT accountobj = accountsja.getJsonObject(i);
+      STRING accountid = upper(accountobj.getString("id"));
+      STRING accounttype = upper(accountobj.getString("type"));
+  
+      IF string_not_empty(accountid) AND string_not_empty(accounttype) THEN
+  
+        INSERT INTO Party_Has_Account VALUES (party, accountid);
+        @@accounts += accountid;
+  
+      ELSE
+
+        RAISE invalid_input_data ("Invalid account input data encountered");
+  
+      END;
+
+    END;
+  
+    @@exact_match_map += to_vertex_set(@@accounts, "Account");
+    @@edge_type_set += "Party_Has_Account";
+  
+  END;
+  
+  IF jobj.containsKey("cards") THEN
+
+    JSONARRAY cardsja = jobj.getJsonArray("cards");
+    FOREACH i IN RANGE[0, cardsja.size() - 1] DO
+  
+      JSONOBJECT cardobj = cardsja.getJsonObject(i);
+      INT cardid = cardobj.getInt("id");
+      STRING cardtype = upper(cardobj.getString("type"));
+  
+      IF cardid > 0 AND string_not_empty(cardtype) THEN
+  
+        INSERT INTO Party_Has_Card VALUES (party, cardid);
+        @@cards += to_string(cardid);
+  
+      ELSE
+
+        RAISE invalid_input_data ("Invalid card input data encountered");
+  
+      END;
+
+    END;
+  
+    @@exact_match_map += to_vertex_set(@@cards, "Card");
+    @@edge_type_set += "Party_Has_Card";
+
+  END;
+
+  @@party_vertex += party;
+  @@party_set = to_vertex_set(@@party_vertex, "Party");
+
+  Start = {@@party_set};
+  Attrs (ANY) = SELECT tgt FROM Start:src -(@@edge_type_set:e)- :tgt;
+
+  ExactMatchAccts = {@@exact_match_map};
+  Attrs = Attrs UNION ExactMatchAccts;
+  
+  IF Attrs.size() > 0 AND @@edge_type_set.size() > 0 THEN
+
+    parties = SELECT tgt FROM Attrs:src -(@@edge_type_set:e)- Party:tgt
+              ACCUM
+                CASE e.type
+                  WHEN "Has_Full_Name" THEN tgt.@score += Customer_Full_Name_weight
+                  WHEN "Has_DOB" THEN tgt.@score += Customer_DOB_weight
+                  WHEN "Has_Email" THEN tgt.@score += Customer_Email_weight
+                  WHEN "Has_Phone" THEN tgt.@score += Customer_Phone_weight
+                  WHEN "Has_Address" THEN tgt.@score += Customer_Address_weight
+                  WHEN "Has_IP" THEN tgt.@score += Customer_IP_weight
+                  WHEN "Has_ID" THEN tgt.@score += Customer_ID_weight
+                  WHEN "Has_Device" THEN tgt.@score += Customer_Device_weight
+                  WHEN "Application_Has_Party" THEN tgt.@score += Customer_Application_weight
+                  WHEN "Party_Has_Account" THEN tgt.@score += Customer_Account_weight
+                  WHEN "Party_Has_Card" THEN tgt.@score += Customer_Card_weight
+                END;
+
+    parties = SELECT src FROM parties:src -(Entity_In_Ring:e)- Connected_Component:tgt
+              ACCUM
+                @@score_map += (tgt -> src.@score)
+              POST-ACCUM
+                src.@score = 0;
+
+    FOREACH (v, score) in @@score_map DO
+      IF v.type == "Connected_Component" THEN
+        @@Connected_Component_ID_heap += Connected_Component_heap_tuple(score, v);
+      END;
+    END;
+
+    IF @@Connected_Component_ID_heap.top().score >= threshold THEN
+
+      VERTEX<Connected_Component> cc = @@Connected_Component_ID_heap.top().ver;
+
+      next = SELECT src FROM Start:src -((Entity_In_Ring|Same_As):e)- :tgt
+             ACCUM
+                DELETE (e);
+
+      INSERT INTO Entity_In_Ring VALUES (party, cc.id);
+
+      erv = True;
+  
+    END;
+
+  END;
+
+  PRINT party AS Party, erv as entity_resolution;
+  
+}

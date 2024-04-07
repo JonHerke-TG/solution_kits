@@ -1,1 +1,2 @@
-
+CREATE GRAPH Entity_Resolution_KYC(Phone, Email, Address, IP, Device, City, Country, State, Full_Name, Zipcode, County, Account, Card, ID, Party, Connected_Component, DOB, Application, Has_Address, Party_Has_Account, Party_Has_Card, Has_ID, Has_IP, Has_Device, Has_Phone, Has_Email, Assigned_To, Located_In, Assigned_To_County, Located_In_State, Located_In_Country, Same_As, Entity_In_Ring, Has_DOB, Has_Full_Name, Application_Has_Party)
+set exit_on_error = "false"
