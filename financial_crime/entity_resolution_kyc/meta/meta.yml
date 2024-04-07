@@ -1,6 +1,7 @@
 metadata:
   name: Entity Resolution (KYC)
   graph: Entity_Resolution
+  depends: financial_crime/library
   description: >
     TigerGraph's Entity Resolution solution for Know Your Customer (KYC) helps organizations verify and link customer identities across multiple data sources. By leveraging graph-based data modeling and advanced algorithms, TigerGraph enables accurate identification and resolution of customer records, reducing duplication and improving data quality. This solution is particularly valuable for industries with strict regulatory compliance requirements, such as banking and healthcare.
   categories:
