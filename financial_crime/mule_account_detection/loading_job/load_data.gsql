@@ -1,0 +1,30 @@
+USE GRAPH Mule_Account_Detection
+
+CREATE LOADING JOB loading_data FOR GRAPH Mule_Account_Detection {
+      DEFINE FILENAME MyDataSource = "/home/tigergraph/solution_kits/financial_crime/mule_account_detection/data/Party.csv";
+      DEFINE FILENAME MyData = "/home/tigergraph/solution_kits/financial_crime/mule_account_detection/data/Transfer_Transaction.csv";
+      LOAD MyDataSource TO VERTEX Party VALUES($0, $1, _, $6, _, $4, _) USING SEPARATOR=",", HEADER="true", EOL="\n";
+      LOAD MyDataSource TO VERTEX Account VALUES($0, _, $1, _, _) USING SEPARATOR=",", HEADER="true", EOL="\n";
+      LOAD MyDataSource TO EDGE Has_Address VALUES($7, $0) USING SEPARATOR=",", HEADER="true", EOL="\n";
+      LOAD MyDataSource TO EDGE Has_Full_Name VALUES($0, $4) USING SEPARATOR=",", HEADER="true", EOL="\n";
+      LOAD MyDataSource TO EDGE Has_Phone VALUES($0, $2) USING SEPARATOR=",", HEADER="true", EOL="\n";
+      LOAD MyDataSource TO EDGE Has_Email VALUES($0, $3) USING SEPARATOR=",", HEADER="true", EOL="\n";
+      LOAD MyDataSource TO EDGE Has_DOB VALUES($0, $6) USING SEPARATOR=",", HEADER="true", EOL="\n";
+      LOAD MyDataSource TO EDGE Has_ID VALUES($0, $5) USING SEPARATOR=",", HEADER="true", EOL="\n";
+      LOAD MyDataSource TO EDGE Has_Device VALUES($0, $13) USING SEPARATOR=",", HEADER="true", EOL="\n";
+      LOAD MyDataSource TO EDGE Has_IP VALUES($0, $12) USING SEPARATOR=",", HEADER="true", EOL="\n";
+      LOAD MyDataSource TO EDGE Assigned_To VALUES($7 Address, $10 Zipcode) USING SEPARATOR=",", HEADER="true", EOL="\n";
+      LOAD MyDataSource TO EDGE Located_In VALUES($7 Address, $9 City) USING SEPARATOR=",", HEADER="true", EOL="\n";
+      LOAD MyDataSource TO EDGE Assigned_To VALUES($10 Zipcode, $9 City) USING SEPARATOR=",", HEADER="true", EOL="\n";
+      LOAD MyDataSource TO EDGE Located_In VALUES($9 City, $8 State) USING SEPARATOR=",", HEADER="true", EOL="\n";
+      LOAD MyDataSource TO EDGE Party_Has_Account VALUES($0, $0) USING SEPARATOR=",", HEADER="true", EOL="\n";
+      LOAD MyData TO VERTEX Transfer_Transaction VALUES($0, $3, $4) USING SEPARATOR=",", HEADER="true", EOL="\n";
+      LOAD MyData TO EDGE Send_Transfer VALUES($1, $0) USING SEPARATOR=",", HEADER="true", EOL="\n";
+      LOAD MyData TO EDGE Receive_Transfer VALUES($0, $2) USING SEPARATOR=",", HEADER="true", EOL="\n";
+
+    }
+     # 3. Run loading job
+      RUN LOADING JOB loading_data
+
+     # 4. Drop loading job
+      DROP JOB loading_data

@@ -1,4 +1,4 @@
-CREATE DISTRIBUTED QUERY AF_number_of_blocked_accounts_on_same_device(/* Parameters here */) FOR GRAPH Fraudster_Detection { 
+CREATE DISTRIBUTED QUERY AF_number_of_blocked_accounts_on_same_device(/* Parameters here */) FOR GRAPH Mule_Account_Detection { 
  
   /*
   * Feature:

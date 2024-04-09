@@ -1,5 +1,5 @@
 CREATE DISTRIBUTED QUERY AF_number_of_blocked_accounts_on_same_IP(
- ) FOR GRAPH Fraudster_Detection {
+ ) FOR GRAPH Mule_Account_Detection {
 
   /*
   * Feature:
