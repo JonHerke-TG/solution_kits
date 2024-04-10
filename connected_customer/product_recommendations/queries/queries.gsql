@@ -31,7 +31,7 @@ CREATE QUERY kmeans(
   MaxAccum<INT> @cluster_id;
   MaxAccum<FLOAT> @@max_attr_value;
   MinAccum<FLOAT> @@min_attr_value;
-    
+
   DATETIME cluster_timestamp = now();
   IF use_custom_timestamp == TRUE THEN
     cluster_timestamp = custom_timestamp;
@@ -46,7 +46,7 @@ CREATE QUERY kmeans(
   INT feature_count = attr_set.size();
 
   MapAccum<INT, MaxAccum<STRING>> @@attr_map;
-  
+
   DATETIME timestamp = now();
 
   JSONARRAY arr;
@@ -198,4 +198,45 @@ CREATE QUERY kmeans(
       INSERT INTO Cluster VALUES (s.@cluster_id, @@final_centroid_values.get(@@max_sse_delta.cluster_count, @@max_sse_delta.iter, s.@cluster_id).centroid_values);
 
   PRINT "Created Cluster Count:", rep_verts.size();
+}
+
+CREATE QUERY combine_features(
+  SET<STRING> hub_v_type,
+  SET<STRING> e_type,
+  STRING target_v_type,
+  SET<STRING> feature_v_type,
+  INT hub_threshold,
+  INT split_threshold) {
+
+  MapAccum<VERTEX, SumAccum<FLOAT>> @intersection_size_map;
+  OrAccum @hub;
+  DATETIME timestamp = now();
+
+  hub_verts = {hub_v_type};
+  hub_verts =
+    SELECT s FROM hub_verts:s
+    WHERE s.outdegree(e_type) > hub_threshold
+    POST-ACCUM s.@hub += TRUE;
+
+  hub_verts =
+    SELECT s FROM hub_verts:s -(e_type)- target_v_type -(e_type)- feature_v_type:t
+    WHERE t.@hub == FALSE OR getvid(s) > getvid(t)
+    ACCUM
+      s.@intersection_size_map += (t -> 1);
+
+
+  // This section of the code cannot be made schema-free
+  hub_verts =
+    SELECT s FROM hub_verts:s -(e_type)- target_v_type:v -(e_type)- feature_v_type:t
+    WHERE (t.@hub == FALSE OR getvid(s) > getvid(t)) AND s.@intersection_size_map.get(t) BETWEEN 2 AND split_threshold
+    ACCUM
+      INSERT INTO Has_Attribute VALUES (v, to_string(getvid(s)) + "_" + to_string(getvid(t)) Combined_Feature, timestamp, 1);
+
+  hub_verts =
+    SELECT s FROM hub_verts:s -(e_type)- target_v_type -(e_type)- feature_v_type:t
+    WHERE (t.@hub == FALSE OR getvid(s) > getvid(t)) AND s.@intersection_size_map.get(t) BETWEEN 2 AND split_threshold
+    PER (s, t)
+    ACCUM
+      INSERT INTO Linked VALUES (s, to_string(getvid(s)) + "_" + to_string(getvid(t)) Combined_Feature, timestamp),
+      INSERT INTO Linked VALUES (t, to_string(getvid(s)) + "_" + to_string(getvid(t)) Combined_Feature, timestamp);
 }

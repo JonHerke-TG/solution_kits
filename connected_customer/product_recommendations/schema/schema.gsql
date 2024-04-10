@@ -13,13 +13,11 @@ CREATE SCHEMA_CHANGE JOB change_schema_of_Product_Recommendation FOR GRAPH Trans
   ADD VERTEX Combined_Feature(PRIMARY_ID id STRING) WITH STATS="OUTDEGREE_BY_EDGETYPE", PRIMARY_ID_AS_ATTRIBUTE="true"
 Edge Types:
   ADD DIRECTED EDGE Belongs_To(FROM Product_Category, TO Product_Category|FROM Product_Variant, TO Product|FROM Product, TO Product_Category) WITH REVERSE_EDGE="reverse_Belongs_To"
-  ADD DIRECTED EDGE reverse_Belongs_To(FROM Product_Category, TO Product_Category|FROM Product_Category, TO Product|FROM Product, TO Product_Variant) WITH REVERSE_EDGE="Belongs_To"
   ADD UNDIRECTED EDGE Interacted(FROM Customer, TO Product_Variant, DISCRIMINATOR( timestamp DATETIME, interaction_type STRING), score FLOAT)
   ADD UNDIRECTED EDGE In_Cluster(FROM Customer, TO Cluster, timestamp DATETIME)
-  ADD UNDIRECTED EDGE Has_Attribute(FROM Customer, TO Customer_Attribute|FROM Product_Variant, TO Product_Attribute, timestamp DATETIME)
+  ADD UNDIRECTED EDGE Has_Attribute(FROM Customer, TO Customer_Attribute|FROM Product_Variant, TO Product_Attribute|FROM Customer, TO Combined_Feature|FROM Product_Variant, TO Combined_Feature, timestamp DATETIME, score FLOAT)
   ADD UNDIRECTED EDGE Compatible(FROM Customer_Attribute, TO Product_Attribute, score FLOAT)
-  ADD DIRECTED EDGE Linked(FROM Combined_Feature, TO Combined_Feature|FROM Customer, TO Combined_Feature|FROM Product_Variant, TO Combined_Feature|FROM Cluster, TO Combined_Feature|FROM Customer_Attribute, TO Combined_Feature|FROM Product_Attribute, TO Combined_Feature) WITH REVERSE_EDGE="reverse_Linked"
-  ADD DIRECTED EDGE reverse_Linked(FROM Combined_Feature, TO Combined_Feature|FROM Combined_Feature, TO Customer|FROM Combined_Feature, TO Product_Variant|FROM Combined_Feature, TO Cluster|FROM Combined_Feature, TO Customer_Attribute|FROM Combined_Feature, TO Product_Attribute, timestamp DATETIME, score FLOAT) WITH REVERSE_EDGE="Linked"
+  ADD DIRECTED EDGE Linked(FROM Combined_Feature, TO Combined_Feature|FROM Customer, TO Combined_Feature|FROM Product_Variant, TO Combined_Feature|FROM Cluster, TO Combined_Feature|FROM Customer_Attribute, TO Combined_Feature|FROM Product_Attribute, TO Combined_Feature, timestamp DATETIME) WITH REVERSE_EDGE="reverse_Linked"
 }
 
 # 3. Run schema_change job
