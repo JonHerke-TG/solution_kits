@@ -1,3 +1,4 @@
+USE GRAPH Transaction_Fraud
 CREATE QUERY tg_pagerank_wt_merchant (
   STRING v_type = "Merchant", 
   STRING e_type = "Merchant_Merchant", 

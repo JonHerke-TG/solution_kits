@@ -1,3 +1,4 @@
+USE GRAPH Transaction_Fraud
 CREATE DISTRIBUTED QUERY merchant_category_transaction_count(
 //STRING file_path = "/home/tigergraph/gsql_output/community_count_transaction.csv",
 //bool save_csv=false, 

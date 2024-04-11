@@ -1,3 +1,4 @@
+USE GRAPH Transaction_Fraud
 CREATE DISTRIBUTED QUERY merchant_transactions_stats(
  Vertex<Merchant> v) FOR GRAPH Transaction_Fraud { 
    

@@ -1,0 +1,256 @@
+{
+    "defaultGraph": "Transaction_Fraud",
+    "iconURL": "/studio/assets/gvis/icons/builtin/64/060-atomic.png",
+    "id": "7CP5XNyxfcaNDhRZ7pKQDT",
+    "pageConfigSeparated": true,
+    "pages": [
+        {
+            "chartMap": {
+                "8Q74gGcRSfhEeeeDyRjWCS": {
+                    "chartSettings": {
+                        "category": [
+                            {
+                                "id": "Category",
+                                "type": "string"
+                            }
+                        ],
+                        "tableHeaders": [
+                            "Category",
+                            "Percentage"
+                        ],
+                        "tableIndex": 0,
+                        "value": [
+                            {
+                                "id": "Percentage",
+                                "type": "number"
+                            }
+                        ]
+                    },
+                    "graphName": "Transaction_Fraud",
+                    "id": "8Q74gGcRSfhEeeeDyRjWCS",
+                    "patternLimit": 300,
+                    "query": "INTERPRET QUERY() FOR GRAPH Transaction_Fraud {\n  TYPEDEF TUPLE <STRING Category, FLOAT Percentage> entry;\n  ListAccum<entry> @@Stats;\n\n  @@Stats += entry(\"Precision other\", 0.29);\n  @@Stats += entry(\"Precision TG\", 0.34);\n  @@Stats += entry(\"Recall other\", 0.76);\n  @@Stats += entry(\"Recall TG\", 0.78);\n  \n    PRINT @@Stats;\n   \n}",
+                    "queryType": "interactive",
+                    "refreshRate": 0,
+                    "searchPattern": [],
+                    "staticData": "{}",
+                    "title": "ML Model Enhancement",
+                    "type": "bar",
+                    "version": "1712625236056834005"
+                },
+                "9nZx95J9WuSJcpuuC5tKPP": {
+                    "chartSettings": {
+                        "borderRadius": 0,
+                        "borderWidth": 50,
+                        "category": [
+                            {
+                                "id": "Category",
+                                "type": "string"
+                            }
+                        ],
+                        "radius": [
+                            0,
+                            80
+                        ],
+                        "roseType": false,
+                        "showLabel": true,
+                        "showLegend": false,
+                        "sortBy": "category",
+                        "tableHeaders": [
+                            "Category",
+                            "Percentage"
+                        ],
+                        "tableIndex": 0,
+                        "value": [
+                            {
+                                "id": "Percentage",
+                                "type": "number"
+                            }
+                        ]
+                    },
+                    "graphName": "Transaction_Fraud",
+                    "id": "9nZx95J9WuSJcpuuC5tKPP",
+                    "patternLimit": 300,
+                    "query": "INTERPRET QUERY() FOR GRAPH Transaction_Fraud {\n  TYPEDEF TUPLE <STRING Category, FLOAT Percentage> entry;\n  ListAccum<entry> @@Stats;\n  SumAccum<FLOAT> @@total, @@normal;\n  FLOAT recall = 0.78;\n  rlt = SELECT s \n        FROM Payment_Transaction:s \n        POST-ACCUM @@total += s.amount,\n        IF s.is_fraud ==0 THEN @@normal += s.amount END;\n    \n  \n\n  //@@Stats += entry(\"Total Transaction Amount\", @@total);\n  //@@Stats += entry(\"Normal Transaction Amount\", @@normal);\n  @@Stats += entry(\"Total Fraud Losses\", @@total -@@normal);\n  @@Stats += entry(\"Revenue Generated\", (@@total -@@normal)*recall);\n  \n    PRINT @@Stats;\n   \n}",
+                    "queryType": "interactive",
+                    "refreshRate": 900,
+                    "searchPattern": [],
+                    "staticData": "{}",
+                    "title": "Live Revenue and Fraud Loss Monitoring Dashboard",
+                    "type": "pie",
+                    "version": "1712787766227752712"
+                },
+                "jm9jf9Rj8UNTJpCYsPSpcu": {
+                    "chartSettings": {
+                        "category": [
+                            {
+                                "id": "Category",
+                                "type": "string"
+                            }
+                        ],
+                        "direction": "Vertical",
+                        "groupMode": [
+                            {
+                                "id": "Grouped"
+                            }
+                        ],
+                        "showBrush": false,
+                        "showLabel": false,
+                        "showLegend": true,
+                        "sortBy": "category",
+                        "tableHeaders": [
+                            "Category",
+                            "LossesInBillionDollars"
+                        ],
+                        "tableIndex": 0,
+                        "value": [
+                            {
+                                "id": "LossesInBillionDollars",
+                                "type": "number"
+                            }
+                        ],
+                        "valueAggregation": [],
+                        "xNameGap": 30,
+                        "yNameGap": 40
+                    },
+                    "graphName": "Transaction_Fraud",
+                    "id": "jm9jf9Rj8UNTJpCYsPSpcu",
+                    "patternLimit": 300,
+                    "query": "INTERPRET QUERY() FOR GRAPH Transaction_Fraud {\n  TYPEDEF TUPLE <STRING Category, FLOAT LossesInBillionDollars> entry;\n  ListAccum<entry> @@Stats;\n\n  @@Stats += entry(\"Glb Mer&Bank(2020)\", 28.58);\n  @@Stats += entry(\"US CC(2020)\", 11);\n  @@Stats += entry(\"Glb Pay(2021)\", 32.39);\n  @@Stats += entry(\"Glb CC(2026)\", 43);\n    PRINT @@Stats;\n   \n  \n  \n  \n  \n  \n}",
+                    "queryType": "interactive",
+                    "refreshRate": 0,
+                    "searchPattern": [],
+                    "staticData": "{}",
+                    "title": "Transaction Fraud Cost",
+                    "type": "bar",
+                    "version": "1712619633669280907"
+                },
+                "k1Jw7Z1dB6gQFHDiwYeguV": {
+                    "chartSettings": {
+                        "category": [
+                            {
+                                "id": "Category",
+                                "type": "string"
+                            }
+                        ],
+                        "tableHeaders": [
+                            "Category",
+                            "Results"
+                        ],
+                        "tableIndex": 0
+                    },
+                    "graphName": "Transaction_Fraud",
+                    "id": "k1Jw7Z1dB6gQFHDiwYeguV",
+                    "patternLimit": 300,
+                    "query": "INTERPRET QUERY() FOR GRAPH Transaction_Fraud {\n  TYPEDEF TUPLE <STRING Category, STRING Results> entry;\n  ListAccum<entry> @@Stats;\n\n  @@Stats += entry(\"Proven True Positive Rate\", \"22% Improvement\");\n  @@Stats += entry(\"Efficiency in Fraud Investigations\", \"300%\");\n  @@Stats += entry(\"Costing Savings\", \"100s of millions\");\n  \n    PRINT @@Stats;\n   \n}",
+                    "queryType": "interactive",
+                    "refreshRate": 0,
+                    "searchPattern": [],
+                    "staticData": "{}",
+                    "title": "Power of TigerGraph",
+                    "type": "table",
+                    "version": "1712621365312565371"
+                },
+                "xih3vLW1JodnAvsN7wYLgm": {
+                    "chartSettings": {
+                        "category": [
+                            {
+                                "id": "Category",
+                                "type": "string"
+                            }
+                        ],
+                        "radius": [
+                            0,
+                            70
+                        ],
+                        "roseType": false,
+                        "showLabel": true,
+                        "showLegend": false,
+                        "tableHeaders": [
+                            "Category",
+                            "Percentage"
+                        ],
+                        "tableIndex": 0,
+                        "value": [
+                            {
+                                "id": "Percentage",
+                                "type": "number"
+                            }
+                        ]
+                    },
+                    "graphName": "Transaction_Fraud",
+                    "id": "xih3vLW1JodnAvsN7wYLgm",
+                    "patternLimit": 300,
+                    "query": "INTERPRET QUERY() FOR GRAPH Transaction_Fraud {\n  TYPEDEF TUPLE <STRING Category, FLOAT Percentage> entry;\n  ListAccum<entry> @@Stats;\n  SumAccum<INT> @@normal, @@fraudulent;\n  tmp = SELECT s \n        FROM Payment_Transaction:s \n        POST-ACCUM IF s.is_fraud ==0 THEN @@normal+=1\n                   ELSE @@fraudulent += 1 END;\n  @@Stats += entry(\"Normal Transaction\", @@normal);\n  @@Stats += entry(\"Fraud Transaction\", @@fraudulent);\n  \n    PRINT @@Stats;\n   \n}",
+                    "queryType": "interactive",
+                    "refreshRate": 900,
+                    "searchPattern": [],
+                    "staticData": "{}",
+                    "title": "Live Fraud  Distribution",
+                    "type": "pie",
+                    "version": "1712787752388571569"
+                }
+            },
+            "globalParameters": {},
+            "iconURL": "/studio/assets/gvis/icons/builtin/64/285-asset.png",
+            "id": "5s79GAycUNW4mGAwYx45Fy",
+            "isDetail": true,
+            "isNew": false,
+            "layouts": {
+                "md": [
+                    {
+                        "h": 21,
+                        "i": "jm9jf9Rj8UNTJpCYsPSpcu",
+                        "moved": false,
+                        "static": false,
+                        "w": 7,
+                        "x": 0,
+                        "y": 0
+                    },
+                    {
+                        "h": 15,
+                        "i": "xih3vLW1JodnAvsN7wYLgm",
+                        "moved": false,
+                        "static": false,
+                        "w": 3,
+                        "x": 0,
+                        "y": 21
+                    },
+                    {
+                        "h": 15,
+                        "i": "k1Jw7Z1dB6gQFHDiwYeguV",
+                        "moved": false,
+                        "static": false,
+                        "w": 4,
+                        "x": 3,
+                        "y": 21
+                    },
+                    {
+                        "h": 21,
+                        "i": "9nZx95J9WuSJcpuuC5tKPP",
+                        "moved": false,
+                        "static": false,
+                        "w": 5,
+                        "x": 7,
+                        "y": 0
+                    },
+                    {
+                        "h": 15,
+                        "i": "8Q74gGcRSfhEeeeDyRjWCS",
+                        "moved": false,
+                        "static": false,
+                        "w": 5,
+                        "x": 7,
+                        "y": 21
+                    }
+                ]
+            },
+            "title": "ROI",
+            "version": "1712625133267414210",
+            "weight": 10
+        }
+    ],
+    "title": "ROI Dashboard",
+    "userRoleForApp": "owner",
+    "version": "1712610699112704606"
+}

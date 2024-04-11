@@ -1,0 +1,16 @@
+USE GRAPH Transaction_Fraud
+CREATE DISTRIBUTED QUERY build_concept_transaction_value(FLOAT amount, BOOL greater_equal) FOR GRAPH Transaction_Fraud { 
+  start = {Payment_Transaction.*};
+  
+  IF greater_equal THEN
+    res = SELECT s FROM start:s WHERE s.amount >= amount
+          POST-ACCUM
+            INSERT INTO DESCRIBES VALUES ("amount>="+to_string(amount), s),
+            INSERT INTO Concept VALUES ("amount>="+to_string(amount), "Leaf", "Transaction with amount greater than or equal to "+to_string(amount));
+  ELSE
+    res = SELECT s FROM start:s WHERE s.amount >= amount
+          POST-ACCUM
+            INSERT INTO DESCRIBES VALUES ("amount<"+to_string(amount), s),
+            INSERT INTO Concept VALUES ("amount<"+to_string(amount), "Leaf", "Transaction with amount less than "+to_string(amount));
+  END;
+}

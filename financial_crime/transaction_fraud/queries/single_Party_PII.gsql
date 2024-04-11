@@ -1,3 +1,4 @@
+USE GRAPH Transaction_Fraud
 CREATE QUERY single_Party_PII(
   Vertex<Party> ver ) FOR GRAPH Transaction_Fraud { 
 // sample party VERTEX: 213137721090747

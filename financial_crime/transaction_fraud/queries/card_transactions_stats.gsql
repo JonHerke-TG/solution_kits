@@ -1,3 +1,4 @@
+USE GRAPH Transaction_Fraud
 CREATE DISTRIBUTED QUERY card_transactions_stats(
  Vertex<Card> v) FOR GRAPH Transaction_Fraud { 
    

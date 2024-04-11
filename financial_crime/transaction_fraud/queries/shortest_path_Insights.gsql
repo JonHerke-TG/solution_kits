@@ -1,3 +1,4 @@
+USE GRAPH Transaction_Fraud
 CREATE QUERY shortest_path_Insights(
   int max_hops=2,
   VERTEX<Payment_Transaction> ver) FOR GRAPH Transaction_Fraud{ 

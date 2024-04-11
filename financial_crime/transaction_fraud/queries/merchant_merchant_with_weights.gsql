@@ -1,3 +1,4 @@
+USE GRAPH Transaction_Fraud
 CREATE DISTRIBUTED QUERY merchant_merchant_with_weights(
     INT min_edge_weight = 1
     ) 

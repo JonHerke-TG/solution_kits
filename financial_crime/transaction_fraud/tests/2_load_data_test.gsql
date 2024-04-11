@@ -1,0 +1,30 @@
+USE GRAPH Transaction_Fraud
+
+CREATE LOADING JOB loading_data FOR GRAPH Transaction_Fraud {
+      DEFINE FILENAME MyDataSource;
+      LOAD MyDataSource TO VERTEX Merchant_Category VALUES($22) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
+      LOAD MyDataSource TO VERTEX Merchant VALUES($25, _, _, _) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
+      LOAD MyDataSource TO VERTEX Payment_Transaction VALUES($20, $28, $23, $24, $21, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
+      LOAD MyDataSource TO VERTEX Card VALUES($1, _, _, _, _, $12) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
+      LOAD MyDataSource TO VERTEX Party VALUES($1, _, $4, $13, _, gsql_concat($2,$3), gsql_current_time_epoch(_)) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
+      LOAD MyDataSource TO VERTEX Party VALUES($25, _, _, _, _, _, gsql_current_time_epoch(_)) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
+      LOAD MyDataSource TO VERTEX City VALUES($6, $11) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
+      LOAD MyDataSource TO EDGE Merchant_Assigned VALUES($25, $22) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
+      LOAD MyDataSource TO EDGE Merchant_Receive_Transaction VALUES($20, $25) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
+      LOAD MyDataSource TO EDGE Card_Send_Transaction VALUES($20, $1) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
+      LOAD MyDataSource TO EDGE Party_Has_Card VALUES($1, $1) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
+      LOAD MyDataSource TO EDGE Is_Merchant VALUES($25, $25) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
+      LOAD MyDataSource TO EDGE Has_IP VALUES($1, $16) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
+      LOAD MyDataSource TO EDGE Has_Device VALUES($1, $17) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
+      LOAD MyDataSource TO EDGE Has_ID VALUES($1, $0) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
+      LOAD MyDataSource TO EDGE Has_Email VALUES($1, $15) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
+      LOAD MyDataSource TO EDGE Has_Full_Name VALUES($1, gsql_concat($2,$3)) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
+      LOAD MyDataSource TO EDGE Has_DOB VALUES($1, $13) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
+      LOAD MyDataSource TO EDGE Has_Phone VALUES($1, $14) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
+      LOAD MyDataSource TO EDGE Has_Address VALUES($5, $1) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
+      LOAD MyDataSource TO EDGE Assigned_To VALUES($5 Address, $8 Zipcode) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
+      LOAD MyDataSource TO EDGE Located_In VALUES($5 Address, $6 City) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
+      LOAD MyDataSource TO EDGE Located_In VALUES($6 City, $7 State) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
+      LOAD MyDataSource TO EDGE Assigned_To VALUES($8 Zipcode, $6 City) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
+      LOAD MyDataSource TO EDGE Has_Interaction_With_Merchant VALUES($1, $25) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
+    }
