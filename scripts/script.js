@@ -6,6 +6,7 @@ import "dotenv/config";
 import AWS from "aws-sdk";
 import mime from "mime";
 import zlib from "zlib";
+import { renderMarkdown } from "./markdown.js";
 
 const bucketName = "tigergraph-solution-kits";
 const disableCacheControl = "max-age=0,no-cache,no-store";
@@ -108,6 +109,30 @@ async function getSolution(dir) {
 
   await syncFolder(`${dir}/data`);
 
+  await syncFolder(`${dir}/model/training/`);
+
+  const markdownFiles = globSync([`${dir}/model/training/*.md`]);
+  for (let markdownFile of markdownFiles) {
+    const html = renderMarkdown(dir, markdownFile)
+    const htmlFile = markdownFile.replace(".md", ".html");
+
+    const params = {
+      ...commonBucketConfig,
+      Key: htmlFile,
+      Body: html,
+      ContentType: "text/html",
+      CacheControl: disableCacheControl,
+    };
+
+    try {
+      const data = await s3.upload(params).promise();
+      console.log(`${htmlFile} => ${data.Location}`);
+    } catch (error) {
+      console.error("Error uploading html file:", error);
+      process.exit(1);
+    }
+  }
+
   return content;
 }
 
@@ -131,11 +156,11 @@ async function getSolutionDetail(dir, first, last) {
   let schemaJSON = "";
   try {
     schemaJSON = fs.readFileSync(`${dir}/meta/schema.json`, "utf8");
-  } catch (error) {}
+  } catch (error) { }
   let styleJSON = "";
   try {
     styleJSON = fs.readFileSync(`${dir}/meta/style.json`, "utf8");
-  } catch (error) {}
+  } catch (error) { }
 
   const queryFiles = globSync([`${dir}/queries/*.gsql`, `${dir}/queries/*/*.gsql`]);
 
@@ -168,8 +193,8 @@ async function getSolutionDetail(dir, first, last) {
 
   let queriesDocs = "";
   try {
-    queriesDocs = fs.readFileSync(`${dir}/meta/queriesDocs.json`, "utf8");
-  } catch (error) {}
+    queriesDocs = fs.readFileSync(`${dir}/meta/metadata_descriptor.json`, "utf8");
+  } catch (error) { }
 
   const hasUDF = fs.existsSync(`${dir}/udfs`);
 
@@ -177,7 +202,7 @@ async function getSolutionDetail(dir, first, last) {
     schema,
     schemaJSON: schemaJSON ? JSON.parse(schemaJSON) : undefined,
     styleJSON: styleJSON ? JSON.parse(styleJSON) : undefined,
-    queriesDocs: queriesDocs ? JSON.parse(queriesDocs).queries : [],
+    queriesDocs: queriesDocs ? [] : [],
     query,
     sampleLoadingJob,
     reset,
@@ -200,7 +225,7 @@ async function main() {
     const params = {
       ...commonBucketConfig,
       Key: `${solution}/meta.json`,
-      Body:  zlib.gzipSync(JSON.stringify(solutionDetails)),
+      Body: zlib.gzipSync(JSON.stringify(solutionDetails)),
       ContentType: "application/json",
       CacheControl: disableCacheControl,
       ContentEncoding: 'gzip'
@@ -218,7 +243,7 @@ async function main() {
   const params = {
     ...commonBucketConfig,
     Key: "list.json",
-    Body:  zlib.gzipSync(JSON.stringify(metadataList)),
+    Body: zlib.gzipSync(JSON.stringify(metadataList)),
     ContentType: "application/json",
     CacheControl: disableCacheControl,
     ContentEncoding: 'gzip'
@@ -229,6 +254,20 @@ async function main() {
     console.log(`list.json => ${data.Location}`);
   } catch (error) {
     console.error("Error uploading solution list:", error);
+    process.exit(1);
+  }
+
+  try {
+    const data = await s3.upload({
+      ...commonBucketConfig,
+      Key: "favicon.ico",
+      Body: fs.readFileSync("scripts/favicon.ico"),
+      ContentType: mime.getType(path.extname("scripts/favicon.ico")),
+      CacheControl: imageCacheControl,
+    }).promise();
+    console.log(`favicon.json => ${data.Location}`);
+  } catch (error) {
+    console.error("Error uploading favicon:", error);
     process.exit(1);
   }
 }
