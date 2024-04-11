@@ -1,0 +1,97 @@
+{
+    "queries": [
+        {
+            "function_header": "delete_all_application_cc_connections",
+            "description": "This query deletes all the Entity_In_Ring edges and is used as the first step in the Entity Resolution process.",
+            "docstring": "This query removes all the Entity_In_Ring edges in the system. This query is used as the first step in the Entity Resolution process. Run the query with `runInstalledQuery('delete_all_application_cc_connections', params={'num_of_batches': 'INSERT_NUM_OF_BATCHES_HERE', 'batch_id': 'INSERT_BATCH_ID_HERE' })` num_of_batches defaults to 1. batch_id defaults to 0",
+            "param_types": {
+                "num_of_batches": "int",
+                "batch_id": "int"
+            }
+        },
+        {
+            "function_header": "match_application_entities",
+            "description": "This query finds matches and creates similarity edges between entities that match. It is used as the second step in the Entity Resolution process, right after running delete_all_application_cc_connections.",
+            "docstring": "This query finds matches between entities. This query inserts same_as edges between entities that match. This query is used as the 2nd step in the Entity Resolution process. Run the query with `runInstalledQuery('match_application_entities', params={ 'Application_Full_Name_weight': 'INSERT_WEIGHT_VALUE_HERE', 'Application_DOB_weight': 'INSERT_WEIGHT_VALUE_HERE', 'Application_Email_weight': 'INSERT_WEIGHT_VALUE_HERE', 'Application_Phone_weight': 'INSERT_WEIGHT_VALUE_HERE', 'Application_Address_weight': 'INSERT_WEIGHT_VALUE_HERE', 'Application_IP_weight': 'INSERT_WEIGHT_VALUE_HERE', 'Application_ID_weight': 'INSERT_WEIGHT_VALUE_HERE', 'Application_Device_weight': 'INSERT_WEIGHT_VALUE_HERE', 'Application_Party_weight': 'INSERT_WEIGHT_VALUE_HERE', 'Application_Account_weight': 'INSERT_WEIGHT_VALUE_HERE', 'Application_Card_weight': 'INSERT_WEIGHT_VALUE_HERE', 'num_of_source_batches': 'INSERT_NUM_OF_SOURCE_BATCHES_HERE', 'num_of_target_batches': 'INSERT_NUM_OF_TARGET_BATCHES_HERE', 'threshold': 'INSERT_THRESHOLD_HERE', 'pii_low_connections_limit': 'INSERT_LOW_CONNECTIONS_LIMIT_HERE', 'pii_high_connections_limit': 'INSERT_HIGH_CONNECTIONS_LIMIT_HERE', 'compute_entities_after_date': 'INSERT_TIMESTAMP_HERE' })` Application_Full_Name_weight defaults to 0.2. Application_DOB_weight defaults to 0.2. Application_Email_weight defaults to 0.2. Application_Phone_weight defaults to 0.2. Application_Address_weight defaults to 0.2. Application_IP_weight defaults to 0.2. Application_ID_weight defaults to 1.0. Application_Device_weight defaults to 1.0. Application_Party_weight defaults to 1.0. Application_Account_weight defaults to 1.0. Application_Card_weight defaults to 1.0. num_of_source_batches defaults to 10. num_of_target_batches defaults to 1. threshold defaults to 1. pii_low_connections_limit defaults to 100. pii_high_connections_limit defaults to 25000. compute_entities_after_date defaults to 1970-01-01 00:00:00",
+            "param_types": {
+                "Application_Full_Name_weight": "float",
+                "Application_DOB_weight": "float",
+                "Application_Email_weight": "float",
+                "Application_Phone_weight": "float",
+                "Application_Address_weight": "float",
+                "Application_IP_weight": "float",
+                "Application_ID_weight": "float",
+                "Application_Device_weight": "float",
+                "Application_Party_weight": "float",
+                "Application_Account_weight": "float",
+                "Application_Card_weight": "float",
+                "num_of_source_batches": "int",
+                "num_of_target_batches": "int",
+                "threshold": "float",
+                "pii_low_connections_limit": "int",
+                "pii_high_connections_limit": "int",
+                "compute_entities_after_date": "datetime"
+            }
+        },
+        {
+            "function_header": "unify_application_entities",
+            "description": "This query groups together the matches entities, by connecting them to the same Connected_Compoennt veretx.",
+            "docstring": "This query groups together the matches entities, by connecting them to the same Connected_Compoennt node. This query creates Entity_In_Ring edges. Run the query with `runInstalledQuery('unify_application_entities')` this query does not have any params",
+            "param_types": {}
+        },
+        {
+            "function_header": "delete_unused_cc_nodes",
+            "description": "This query deletes all the unused Connected_Component vertices and it is used as an optional extra step after running the Entity Resolution process.",
+            "docstring": "This query removes all the unused Connected_Component nodes in the system. This query is used as an optional extra step after running the Entity Resolution process. Run the query with `runInstalledQuery('delete_unused_cc_nodes', params={'num_of_batches': 'INSERT_NUM_OF_BATCHES_HERE', 'batch_id': 'INSERT_BATCH_ID_HERE' })` num_of_batches defaults to 1. batch_id defaults to 0",
+            "param_types": {
+                "num_of_batches": "int",
+                "batch_id": "int"
+            }
+        },
+        {
+            "function_header": "incremental_application_match",
+            "description": "",
+            "docstring": "",
+            "param_types": {
+                "Application_Full_Name_weight": "float",
+                "Application_DOB_weight": "float",
+                "Application_Email_weight": "float",
+                "Application_Phone_weight": "float",
+                "Application_Address_weight": "float",
+                "Application_IP_weight": "float",
+                "Application_ID_weight": "float",
+                "Application_Device_weight": "float",
+                "Application_Party_weight": "float",
+                "Application_Account_weight": "float",
+                "Application_Card_weight": "float",
+                "threshold": "float"
+            }
+        },
+        {
+            "function_header": "incremental_application_unify",
+            "description": "",
+            "docstring": "",
+            "param_types": {
+                "applications": "SET<VERTEX<Application>>"
+            }
+        },
+        {
+            "function_header": "get_application_cc_features",
+            "description": "",
+            "docstring": "",
+            "param_types": {
+                "application": "VERTEX<Application>",
+                "connections": "int"
+            }
+        },
+        {
+            "function_header": "distance_and_path_to_fraud_application",
+            "description": "",
+            "docstring": "",
+            "param_types": {
+                "input": "VERTEX<Application>",
+                "depth": "int"
+            }
+        }
+    ]
+}
