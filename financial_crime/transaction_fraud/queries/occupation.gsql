@@ -1,3 +1,4 @@
+USE GRAPH Transaction_Fraud
 CREATE DISTRIBUTED QUERY occupation(/* Parameters here */) FOR GRAPH Transaction_Fraud { 
  
 

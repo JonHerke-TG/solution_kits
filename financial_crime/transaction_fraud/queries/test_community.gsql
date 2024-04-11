@@ -1,3 +1,4 @@
+USE GRAPH Transaction_Fraud
 CREATE DISTRIBUTED QUERY test_community(/* Parameters here */) FOR GRAPH Transaction_Fraud { 
  SetAccum<FLOAT> @@max, @@min, @@avg, @@total;
  SetAccum<INT> @@count ;

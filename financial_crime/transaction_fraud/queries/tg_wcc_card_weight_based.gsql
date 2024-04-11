@@ -1,3 +1,4 @@
+USE GRAPH Transaction_Fraud
 CREATE QUERY tg_wcc_card_weight_based (
   
   INT print_limit = 100,

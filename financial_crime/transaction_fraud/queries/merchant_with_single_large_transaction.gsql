@@ -1,3 +1,4 @@
+USE GRAPH Transaction_Fraud
 CREATE DISTRIBUTED QUERY merchant_with_single_large_transaction(
   DATETIME min_createTime = to_datetime("2020-01-01"),
   DATETIME max_createTime = to_datetime("2024-01-01"),

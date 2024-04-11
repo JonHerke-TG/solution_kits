@@ -1,3 +1,4 @@
+USE GRAPH Transaction_Fraud
 CREATE DISTRIBUTED QUERY insights_show_path(
 Vertex<Payment_Transaction> ver) FOR GRAPH Transaction_Fraud { 
   /* Write query logic here */ 

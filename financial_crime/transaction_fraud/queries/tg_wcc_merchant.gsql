@@ -1,3 +1,4 @@
+USE GRAPH Transaction_Fraud
 CREATE QUERY tg_wcc_merchant (
   //STRING v_type_set = "Merchant", 
   //STRING e_type_set = "Merchant_Merchant", 

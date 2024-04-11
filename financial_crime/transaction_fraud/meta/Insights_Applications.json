@@ -1,0 +1,915 @@
+{
+    "defaultGraph": "Transaction_Fraud",
+    "iconURL": "/studio/assets/gvis/icons/builtin/64/285-asset.png",
+    "id": "1P8CinRDEjCp4MJC1ZeE4z",
+    "pageConfigSeparated": true,
+    "pages": [
+        {
+            "chartMap": {
+                "mKFUTzP4fjwmx7LCDHisYH": {
+                    "chartSettings": {
+                        "inputStates": [
+                            {
+                                "dataType": "Vertex",
+                                "id": "input_qCHJMcVwtZGXN79CvSRFYV",
+                                "name": "id",
+                                "settings": {},
+                                "value": "",
+                                "widgetType": "Input"
+                            }
+                        ]
+                    },
+                    "graphName": "Transaction_Fraud",
+                    "id": "mKFUTzP4fjwmx7LCDHisYH",
+                    "patternLimit": 300,
+                    "query": "",
+                    "queryType": "pattern",
+                    "refreshRate": 0,
+                    "searchPattern": [],
+                    "staticData": "{}",
+                    "title": "Input Payment Transaction",
+                    "type": "Inputs",
+                    "version": "1712362722865061960"
+                },
+                "pbCgshkDTGwbMf3uvmjiQX": {
+                    "chartSettings": {
+                        "widgetActions": [
+                            {
+                                "params": [
+                                    {
+                                        "isCreatable": false,
+                                        "name": "",
+                                        "paramGlobalInput": "variable",
+                                        "value": "variable"
+                                    }
+                                ],
+                                "text": "",
+                                "url": ""
+                            }
+                        ]
+                    },
+                    "graphName": "Transaction_Fraud",
+                    "id": "pbCgshkDTGwbMf3uvmjiQX",
+                    "patternLimit": 300,
+                    "query": "",
+                    "queryType": "pattern",
+                    "refreshRate": 0,
+                    "searchPattern": [
+                        {
+                            "data": "insights_show_path",
+                            "id": "insights_show_path",
+                            "type": "QUERY"
+                        },
+                        {
+                            "data": "id",
+                            "id": "4d7dbb28-369b-4588-b5fc-77ca6d0a6428",
+                            "paramGlobalInput": "id",
+                            "paramName": "ver",
+                            "paramType": "VERTEX",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM",
+                            "vertexType": "Payment_Transaction"
+                        }
+                    ],
+                    "staticData": "{}",
+                    "title": "Shortest_Path_TO_Fraudulent_Transaction",
+                    "type": "internal-graph",
+                    "version": "1712362950137587892"
+                },
+                "uY8YLafrcr2ojkVpYQhvfs": {
+                    "chartSettings": {
+                        "showColumns": [
+                            {
+                                "isChecked": true,
+                                "name": "v_id"
+                            },
+                            {
+                                "isChecked": false,
+                                "name": "v_type"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "rlt.@path"
+                            }
+                        ],
+                        "sortedColumns": [
+                            "v_id",
+                            "rlt.@path"
+                        ],
+                        "tableColumns": [
+                            {
+                                "id": "Matched pattern",
+                                "isChecked": "true",
+                                "label": ""
+                            },
+                            {
+                                "children": [],
+                                "id": "Vertices",
+                                "isChecked": "true",
+                                "isExpanded": true,
+                                "label": "Vertices"
+                            },
+                            {
+                                "children": [],
+                                "id": "Edges",
+                                "isChecked": "true",
+                                "isExpanded": false,
+                                "label": "Edges"
+                            }
+                        ],
+                        "tableHeaders": [
+                            "v_id",
+                            "v_type",
+                            "rlt.@path"
+                        ],
+                        "tableIndex": 1
+                    },
+                    "graphName": "Transaction_Fraud",
+                    "id": "uY8YLafrcr2ojkVpYQhvfs",
+                    "patternLimit": 300,
+                    "query": "",
+                    "queryType": "pattern",
+                    "refreshRate": 0,
+                    "searchPattern": [
+                        {
+                            "data": "insights_show_path",
+                            "id": "insights_show_path",
+                            "type": "QUERY"
+                        },
+                        {
+                            "data": "id",
+                            "id": "6c2fb078-10bd-464b-bd24-48d0a8b3e5ed",
+                            "paramGlobalInput": "id",
+                            "paramName": "ver",
+                            "paramType": "VERTEX",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM",
+                            "vertexType": "Payment_Transaction"
+                        }
+                    ],
+                    "staticData": "{}",
+                    "title": "Path TO Fraudulent Transactions",
+                    "type": "table",
+                    "version": "1712599608090871885"
+                }
+            },
+            "globalParameters": {
+                "id": {
+                    "id": "input_qCHJMcVwtZGXN79CvSRFYV",
+                    "name": "id",
+                    "type": "VERTEX",
+                    "value": {
+                        "vertexID": "0b03161fd48579c6330fa5ad81bb4961",
+                        "vertexType": "Payment_Transaction"
+                    }
+                }
+            },
+            "iconURL": "/studio/assets/gvis/icons/builtin/64/052-cells.png",
+            "id": "39YYeQP4hVsfNHcchBvTpr",
+            "isDetail": true,
+            "isNew": false,
+            "layouts": {
+                "md": [
+                    {
+                        "h": 11,
+                        "i": "mKFUTzP4fjwmx7LCDHisYH",
+                        "moved": false,
+                        "static": false,
+                        "w": 6,
+                        "x": 6,
+                        "y": 0
+                    },
+                    {
+                        "h": 32,
+                        "i": "pbCgshkDTGwbMf3uvmjiQX",
+                        "moved": false,
+                        "static": false,
+                        "w": 6,
+                        "x": 0,
+                        "y": 0
+                    },
+                    {
+                        "h": 21,
+                        "i": "uY8YLafrcr2ojkVpYQhvfs",
+                        "moved": false,
+                        "static": false,
+                        "w": 6,
+                        "x": 6,
+                        "y": 11
+                    }
+                ],
+                "xs": [
+                    {
+                        "h": 8,
+                        "i": "mKFUTzP4fjwmx7LCDHisYH",
+                        "moved": false,
+                        "static": false,
+                        "w": 4,
+                        "x": 0,
+                        "y": 0
+                    },
+                    {
+                        "h": 29,
+                        "i": "pbCgshkDTGwbMf3uvmjiQX",
+                        "moved": false,
+                        "static": false,
+                        "w": 4,
+                        "x": 0,
+                        "y": 8
+                    },
+                    {
+                        "h": 21,
+                        "i": "uY8YLafrcr2ojkVpYQhvfs",
+                        "moved": false,
+                        "static": false,
+                        "w": 4,
+                        "x": 0,
+                        "y": 37
+                    }
+                ]
+            },
+            "title": "Shortest_Path_Fraudulent_Transaction",
+            "version": "1712599890682094479",
+            "weight": 30
+        },
+        {
+            "chartMap": {
+                "hYnMuQBjb12fqydSPEkxLo": {
+                    "chartSettings": {
+                        "pageSize": 20,
+                        "showColumns": [
+                            {
+                                "isChecked": true,
+                                "name": "v_id"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "v_type"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "rlt.@count"
+                            }
+                        ],
+                        "tableColumns": [
+                            {
+                                "id": "Matched pattern",
+                                "isChecked": "true",
+                                "label": ""
+                            },
+                            {
+                                "children": [],
+                                "id": "Vertices",
+                                "isChecked": "true",
+                                "isExpanded": true,
+                                "label": "Vertices"
+                            },
+                            {
+                                "children": [],
+                                "id": "Edges",
+                                "isChecked": "true",
+                                "isExpanded": false,
+                                "label": "Edges"
+                            }
+                        ],
+                        "tableHeaders": [
+                            "v_id",
+                            "v_type",
+                            "rlt.@count"
+                        ]
+                    },
+                    "graphName": "Transaction_Fraud",
+                    "id": "hYnMuQBjb12fqydSPEkxLo",
+                    "patternLimit": 300,
+                    "query": "",
+                    "queryType": "pattern",
+                    "refreshRate": 0,
+                    "searchPattern": [
+                        {
+                            "data": "card_has_frequent_transactions",
+                            "id": "card_has_frequent_transactions",
+                            "type": "QUERY"
+                        },
+                        {
+                            "data": "1546732800",
+                            "id": "088f92e4-f33f-421b-8a9b-ec4ebab7021c",
+                            "paramGlobalInput": "",
+                            "paramName": "min_createTime",
+                            "paramType": "DATETIME",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        },
+                        {
+                            "data": "1641600000",
+                            "id": "5b150d81-55ba-47bd-8ff1-953950ffea87",
+                            "paramGlobalInput": "",
+                            "paramName": "max_createTime",
+                            "paramType": "DATETIME",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        },
+                        {
+                            "data": "2000",
+                            "id": "af038528-275b-4001-9760-2b638d487f28",
+                            "paramGlobalInput": "",
+                            "paramName": "freq",
+                            "paramType": "INT",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        }
+                    ],
+                    "staticData": "{}",
+                    "title": "High_Frequency_TXN_Card",
+                    "type": "table",
+                    "version": "1712355442556091707"
+                },
+                "i3MCNi1xFiNzMzZrF6qRTk": {
+                    "chartSettings": {
+                        "algorithm": {
+                            "edgeAttr": "",
+                            "edgeType": "",
+                            "styleBy": "size",
+                            "type": "pageRank",
+                            "vertexType": "Card",
+                            "weighted": false
+                        },
+                        "layout": "Force",
+                        "widgetActions": [
+                            {
+                                "params": [
+                                    {
+                                        "name": "freq",
+                                        "value": "100"
+                                    }
+                                ],
+                                "text": "",
+                                "url": ""
+                            }
+                        ]
+                    },
+                    "graphName": "Transaction_Fraud",
+                    "id": "i3MCNi1xFiNzMzZrF6qRTk",
+                    "patternLimit": 300,
+                    "query": "",
+                    "queryType": "pattern",
+                    "refreshRate": 0,
+                    "searchPattern": [
+                        {
+                            "data": "card_has_frequent_transactions",
+                            "id": "card_has_frequent_transactions",
+                            "type": "QUERY"
+                        },
+                        {
+                            "data": "1546732800",
+                            "id": "501b5863-3f44-47b8-904d-190fb390bd7d",
+                            "paramGlobalInput": "",
+                            "paramName": "min_createTime",
+                            "paramType": "DATETIME",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        },
+                        {
+                            "data": "1641600000",
+                            "id": "badec3c5-5571-4534-9bfa-2f1562be460b",
+                            "paramGlobalInput": "",
+                            "paramName": "max_createTime",
+                            "paramType": "DATETIME",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        },
+                        {
+                            "data": "2000",
+                            "id": "1ad68859-d1d1-4db9-b98b-22619aeb7401",
+                            "paramGlobalInput": "",
+                            "paramName": "freq",
+                            "paramType": "INT",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        }
+                    ],
+                    "staticData": "{}",
+                    "title": "Transaction_Frequency",
+                    "type": "internal-graph",
+                    "version": "1712240916487365928"
+                }
+            },
+            "globalParameters": {},
+            "iconURL": "/studio/assets/gvis/icons/builtin/64/045-book-1.png",
+            "id": "55VMRALeGMiZZmjvHfHv8p",
+            "isDetail": true,
+            "isNew": false,
+            "layouts": {
+                "md": [
+                    {
+                        "h": 30,
+                        "i": "hYnMuQBjb12fqydSPEkxLo",
+                        "moved": false,
+                        "static": false,
+                        "w": 5,
+                        "x": 7,
+                        "y": 0
+                    },
+                    {
+                        "h": 31,
+                        "i": "i3MCNi1xFiNzMzZrF6qRTk",
+                        "moved": false,
+                        "static": false,
+                        "w": 7,
+                        "x": 0,
+                        "y": 0
+                    }
+                ]
+            },
+            "title": "Transaction_Frequency",
+            "version": "1709079042456245396",
+            "weight": 10
+        },
+        {
+            "chartMap": {
+                "4QYhdJVbfoeUnGjAzhi5sG": {
+                    "chartSettings": {
+                        "pageSize": 20,
+                        "showColumns": [
+                            {
+                                "isChecked": true,
+                                "name": "Vertex_ID"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "score"
+                            }
+                        ],
+                        "tableColumns": [
+                            {
+                                "id": "Matched pattern",
+                                "isChecked": "true",
+                                "label": ""
+                            },
+                            {
+                                "children": [],
+                                "id": "Vertices",
+                                "isChecked": "true",
+                                "isExpanded": true,
+                                "label": "Vertices"
+                            },
+                            {
+                                "children": [],
+                                "id": "Edges",
+                                "isChecked": "true",
+                                "isExpanded": false,
+                                "label": "Edges"
+                            }
+                        ],
+                        "tableHeaders": [
+                            "Vertex_ID",
+                            "score"
+                        ]
+                    },
+                    "graphName": "Transaction_Fraud",
+                    "id": "4QYhdJVbfoeUnGjAzhi5sG",
+                    "patternLimit": 300,
+                    "query": "",
+                    "queryType": "pattern",
+                    "refreshRate": 0,
+                    "searchPattern": [
+                        {
+                            "data": "tg_pagerank_wt_merchant_insights",
+                            "id": "tg_pagerank_wt_merchant_insights",
+                            "type": "QUERY"
+                        },
+                        {
+                            "data": "Merchant",
+                            "id": "6d31a3fb-ca4a-4f9b-b852-79ca9f0a7a62",
+                            "paramGlobalInput": "",
+                            "paramName": "v_type",
+                            "paramType": "STRING",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        },
+                        {
+                            "data": "Merchant_Merchant",
+                            "id": "82dd6e19-9592-4e0c-b9fb-77306fcea328",
+                            "paramGlobalInput": "",
+                            "paramName": "e_type",
+                            "paramType": "STRING",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        },
+                        {
+                            "data": "weight",
+                            "id": "627242db-6e9a-41ae-8574-e92fd3f9d057",
+                            "paramGlobalInput": "",
+                            "paramName": "weight_attribute",
+                            "paramType": "STRING",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        },
+                        {
+                            "data": "0.001",
+                            "id": "7ace181c-bc48-427b-9616-a6433c0a0c8e",
+                            "paramGlobalInput": "",
+                            "paramName": "max_change",
+                            "paramType": "FLOAT",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        },
+                        {
+                            "data": "25",
+                            "id": "efc9eb1e-c106-4e4c-b05b-eaf246a5dd26",
+                            "paramGlobalInput": "",
+                            "paramName": "maximum_iteration",
+                            "paramType": "INT",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        },
+                        {
+                            "data": "0.85",
+                            "id": "b5ad7798-5d2f-4c5f-8458-d819b69e760c",
+                            "paramGlobalInput": "",
+                            "paramName": "damping",
+                            "paramType": "FLOAT",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        },
+                        {
+                            "data": "100",
+                            "id": "dc9a3a5c-5937-40f7-bc49-8fb512a8f70b",
+                            "paramGlobalInput": "",
+                            "paramName": "top_k",
+                            "paramType": "INT",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        },
+                        {
+                            "data": "true",
+                            "id": "cd6be6ee-5ca4-4eeb-92d7-83e21e36e68b",
+                            "paramGlobalInput": "",
+                            "paramName": "print_results",
+                            "paramType": "BOOL",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        },
+                        {
+                            "data": "pagerank",
+                            "id": "a9a0cca7-33e9-4531-a3fb-ca736b8d7a75",
+                            "paramGlobalInput": "",
+                            "paramName": "result_attribute",
+                            "paramType": "STRING",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        },
+                        {
+                            "data": "",
+                            "id": "1a7a915c-a7bb-4b7c-b021-9006d1dcc294",
+                            "paramGlobalInput": "",
+                            "paramName": "file_path",
+                            "paramType": "STRING",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        },
+                        {
+                            "data": "true",
+                            "id": "d8823c20-af8d-4a69-a313-a3516c5ac94a",
+                            "paramGlobalInput": "",
+                            "paramName": "display_edges",
+                            "paramType": "BOOL",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        }
+                    ],
+                    "staticData": "{}",
+                    "title": "Top_Pagerank_Score_Merchant",
+                    "type": "table",
+                    "version": "1709073374416093139"
+                },
+                "nLdSm9KfPcJrmCcdi8Y1gW": {
+                    "chartSettings": {},
+                    "graphName": "Transaction_Fraud",
+                    "id": "nLdSm9KfPcJrmCcdi8Y1gW",
+                    "patternLimit": 300,
+                    "query": "",
+                    "queryType": "pattern",
+                    "refreshRate": 0,
+                    "searchPattern": [
+                        {
+                            "data": "tg_pagerank_wt_merchant_insights",
+                            "id": "tg_pagerank_wt_merchant_insights",
+                            "type": "QUERY"
+                        },
+                        {
+                            "data": "Merchant",
+                            "id": "12ead0ad-d5f6-4055-b351-686749599d1b",
+                            "paramGlobalInput": "",
+                            "paramName": "v_type",
+                            "paramType": "STRING",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        },
+                        {
+                            "data": "Merchant_Merchant",
+                            "id": "06200303-94be-4268-8d0d-669d21558d2d",
+                            "paramGlobalInput": "",
+                            "paramName": "e_type",
+                            "paramType": "STRING",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        },
+                        {
+                            "data": "weight",
+                            "id": "f24655b9-8711-4b9a-8260-5c2a976e402b",
+                            "paramGlobalInput": "",
+                            "paramName": "weight_attribute",
+                            "paramType": "STRING",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        },
+                        {
+                            "data": "0.001",
+                            "id": "b8bceabe-f46c-4819-ade7-ed40d7fd0bd2",
+                            "paramGlobalInput": "",
+                            "paramName": "max_change",
+                            "paramType": "FLOAT",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        },
+                        {
+                            "data": "25",
+                            "id": "8ef84ae9-fee3-4c12-9f2c-c92b7df20fb1",
+                            "paramGlobalInput": "",
+                            "paramName": "maximum_iteration",
+                            "paramType": "INT",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        },
+                        {
+                            "data": "0.85",
+                            "id": "9f422d93-8bd1-4ef0-9b93-60ab5d197d2e",
+                            "paramGlobalInput": "",
+                            "paramName": "damping",
+                            "paramType": "FLOAT",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        },
+                        {
+                            "data": "5",
+                            "id": "ee0b5d3f-2507-4ca6-b41a-79c658f092d9",
+                            "paramGlobalInput": "",
+                            "paramName": "top_k",
+                            "paramType": "INT",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        },
+                        {
+                            "data": "true",
+                            "id": "e488294d-3059-4ce3-8216-df874c91856b",
+                            "paramGlobalInput": "",
+                            "paramName": "print_results",
+                            "paramType": "BOOL",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        },
+                        {
+                            "data": "pagerank",
+                            "id": "48722f92-23b8-4e67-a4c4-3c9ab07822ba",
+                            "paramGlobalInput": "",
+                            "paramName": "result_attribute",
+                            "paramType": "STRING",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        },
+                        {
+                            "data": "",
+                            "id": "7375642e-1d7c-490f-b9da-f71b75bc9bc8",
+                            "paramGlobalInput": "",
+                            "paramName": "file_path",
+                            "paramType": "STRING",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        },
+                        {
+                            "data": "true",
+                            "id": "4643a3e7-f872-48eb-a326-fa2dbe1ffe0c",
+                            "paramGlobalInput": "",
+                            "paramName": "display_edges",
+                            "paramType": "BOOL",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        }
+                    ],
+                    "staticData": "{}",
+                    "title": "Merchant_Network_Pagerank",
+                    "type": "internal-graph",
+                    "version": "1709073222391970188"
+                }
+            },
+            "globalParameters": {},
+            "iconURL": "/studio/assets/gvis/icons/builtin/64/054-ascend.png",
+            "id": "9yXVmB34tmy51WURchUbVu",
+            "isDetail": true,
+            "isNew": false,
+            "layouts": {
+                "md": [
+                    {
+                        "h": 31,
+                        "i": "4QYhdJVbfoeUnGjAzhi5sG",
+                        "moved": false,
+                        "static": false,
+                        "w": 5,
+                        "x": 6,
+                        "y": 0
+                    },
+                    {
+                        "h": 31,
+                        "i": "nLdSm9KfPcJrmCcdi8Y1gW",
+                        "moved": false,
+                        "static": false,
+                        "w": 6,
+                        "x": 0,
+                        "y": 0
+                    }
+                ]
+            },
+            "title": "Merchant_Network_Pagerank",
+            "version": "1709073432239406490",
+            "weight": 20
+        },
+        {
+            "chartMap": {
+                "3qwAWAUFV5KU9ePKiKCYnu": {
+                    "chartSettings": {
+                        "pageSize": 20,
+                        "showColumns": [
+                            {
+                                "isChecked": true,
+                                "name": "v_id"
+                            },
+                            {
+                                "isChecked": false,
+                                "name": "v_type"
+                            },
+                            {
+                                "isChecked": true,
+                                "name": "rlt.@totalAmount"
+                            }
+                        ],
+                        "sortedColumns": [
+                            "v_id",
+                            "rlt.@totalAmount"
+                        ],
+                        "tableColumns": [
+                            {
+                                "id": "Matched pattern",
+                                "isChecked": "true",
+                                "label": ""
+                            },
+                            {
+                                "children": [],
+                                "id": "Vertices",
+                                "isChecked": "true",
+                                "isExpanded": true,
+                                "label": "Vertices"
+                            },
+                            {
+                                "children": [],
+                                "id": "Edges",
+                                "isChecked": "true",
+                                "isExpanded": false,
+                                "label": "Edges"
+                            }
+                        ],
+                        "tableHeaders": [
+                            "v_id",
+                            "v_type",
+                            "rlt.@totalAmount"
+                        ],
+                        "tableIndex": 0
+                    },
+                    "graphName": "Transaction_Fraud",
+                    "id": "3qwAWAUFV5KU9ePKiKCYnu",
+                    "patternLimit": 300,
+                    "query": "",
+                    "queryType": "pattern",
+                    "refreshRate": 0,
+                    "searchPattern": [
+                        {
+                            "data": "card_has_large_total_amount",
+                            "id": "card_has_large_total_amount",
+                            "type": "QUERY"
+                        },
+                        {
+                            "data": "946684800",
+                            "id": "147e503d-cd12-4b37-8d26-1dd61d8ec7d0",
+                            "paramGlobalInput": "",
+                            "paramName": "min_createTime",
+                            "paramType": "DATETIME",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        },
+                        {
+                            "data": "1704067200",
+                            "id": "45f9dcea-b826-47cb-8f62-50a1e94d403b",
+                            "paramGlobalInput": "",
+                            "paramName": "max_createTime",
+                            "paramType": "DATETIME",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        },
+                        {
+                            "data": "200000",
+                            "id": "320436ba-3141-43a3-a4dd-ee32e15cfdb0",
+                            "paramGlobalInput": "",
+                            "paramName": "m",
+                            "paramType": "DOUBLE",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        }
+                    ],
+                    "staticData": "{}",
+                    "title": "Large_Total_Transaction_Amount",
+                    "type": "table",
+                    "version": "1709079153798667186"
+                },
+                "6bJip2yUc4Ubs6JsmkuHKv": {
+                    "chartSettings": {},
+                    "graphName": "Transaction_Fraud",
+                    "id": "6bJip2yUc4Ubs6JsmkuHKv",
+                    "patternLimit": 300,
+                    "query": "",
+                    "queryType": "pattern",
+                    "refreshRate": 0,
+                    "searchPattern": [
+                        {
+                            "data": "card_has_large_total_amount",
+                            "id": "card_has_large_total_amount",
+                            "type": "QUERY"
+                        },
+                        {
+                            "data": "946684800",
+                            "id": "ecd2f31b-5608-4dde-8b11-013e69cf8765",
+                            "paramGlobalInput": "",
+                            "paramName": "min_createTime",
+                            "paramType": "DATETIME",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        },
+                        {
+                            "data": "1704067200",
+                            "id": "a792de6a-c5bb-4c48-871b-88657d5490d9",
+                            "paramGlobalInput": "",
+                            "paramName": "max_createTime",
+                            "paramType": "DATETIME",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        },
+                        {
+                            "data": "200000",
+                            "id": "6d381224-d772-4ca2-8334-491540a4881f",
+                            "paramGlobalInput": "",
+                            "paramName": "m",
+                            "paramType": "DOUBLE",
+                            "paramTypeReadonly": true,
+                            "type": "PARAM"
+                        }
+                    ],
+                    "staticData": "{}",
+                    "title": "Card_with_Large_Total_Transaction_Amount",
+                    "type": "internal-graph",
+                    "version": "1709077539103630832"
+                }
+            },
+            "globalParameters": {},
+            "iconURL": "/studio/assets/gvis/icons/builtin/64/285-asset.png",
+            "id": "aWcES49wzQAbqhqAnTX3Qs",
+            "isDetail": true,
+            "isNew": false,
+            "layouts": {
+                "md": [
+                    {
+                        "h": 32,
+                        "i": "3qwAWAUFV5KU9ePKiKCYnu",
+                        "moved": false,
+                        "static": false,
+                        "w": 5,
+                        "x": 7,
+                        "y": 0
+                    },
+                    {
+                        "h": 32,
+                        "i": "6bJip2yUc4Ubs6JsmkuHKv",
+                        "moved": false,
+                        "static": false,
+                        "w": 7,
+                        "x": 0,
+                        "y": 0
+                    }
+                ]
+            },
+            "title": "Large_Total_Amount_Transaction",
+            "version": "1709079165100901007",
+            "weight": 40
+        }
+    ],
+    "title": "Transaction Fraud",
+    "userRoleForApp": "owner",
+    "version": "1709060017544243618"
+}

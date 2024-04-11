@@ -1,3 +1,4 @@
+USE GRAPH Transaction_Fraud
 CREATE QUERY shortest_path_length(
   int max_hops=5,
   VERTEX<Payment_Transaction> ver) FOR GRAPH Transaction_Fraud RETURNS(INT){ 

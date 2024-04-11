@@ -6,10 +6,18 @@ GRAPH_NAME="Transaction_Fraud"
 # Directory containing your .gsql files
 QUERY_DIR="./queries"
 
+gsql -g Transaction_Fraud ./queries/mer_shortest_path_length.gsql
+gsql -g Transaction_Fraud INSTALL QUERY mer_shortest_path_length
+
 # Iterate over each .gsql file in the directory
 for file in "$QUERY_DIR"/*.gsql; do
-    echo "Running $file..."
-    gsql -g "$GRAPH_NAME" "$file"
+    # Skip the mer_shortest_path_length.gsql file
+    if [[ "$(basename "$file")" != "mer_shortest_path_length.gsql" ]]; then
+        echo "Running $file..."
+        gsql -g "$GRAPH_NAME" "$file"
+    else
+        echo "Skipping $file..."
+    fi
 done
 
 echo "All scripts have been executed."

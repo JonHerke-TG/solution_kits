@@ -1,3 +1,4 @@
+USE GRAPH Transaction_Fraud
 CREATE DISTRIBUTED QUERY merchant_category(/* Parameters here */) FOR GRAPH Transaction_Fraud { 
   /*
   This query assigns the merchant's category to the 'feature' attribute of linked Payment_Transaction 

@@ -1,3 +1,4 @@
+USE GRAPH Transaction_Fraud
 CREATE QUERY degrees()  FOR GRAPH Transaction_Fraud {
   
   /**
