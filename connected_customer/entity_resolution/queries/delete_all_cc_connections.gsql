@@ -1,6 +1,6 @@
 USE GRAPH Entity_Resolution
 DROP QUERY delete_all_cc_connections
-CREATE OR REPLACE DISTRIBUTED QUERY delete_all_cc_connections(INT num_of_batches = 20, INT batch_id = 0) FOR GRAPH Entity_Resolution{ 
+CREATE OR REPLACE DISTRIBUTED QUERY delete_all_cc_connections(INT num_of_batches = 1, INT batch_id = 0) FOR GRAPH Entity_Resolution{ 
 
   SumAccum<INT> @@count;
   
