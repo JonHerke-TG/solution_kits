@@ -1,0 +1,54 @@
+# 1. Use graph
+USE GRAPH Entity_Resolution_KYC
+
+# 2. Create loading job
+CREATE LOADING JOB loading_kyc_data FOR GRAPH Entity_Resolution_KYC {
+
+    DEFINE FILENAME party = "data/kyc_data.csv";
+
+    LOAD party TO VERTEX Party VALUES($0, $1, $2, $3, $4, $5, $6) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+
+    LOAD party TO VERTEX Device VALUES($22) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD party TO EDGE Has_Device VALUES($0, $22) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+
+    LOAD party TO VERTEX IP VALUES($21) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD party TO EDGE Has_IP VALUES($0, $21) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+
+    LOAD party TO VERTEX ID VALUES($19, $20) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD party TO EDGE Has_ID VALUES($0, $19) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+
+    LOAD party TO VERTEX DOB VALUES($3) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD party TO EDGE Has_DOB VALUES($0, $3) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+
+    LOAD party TO VERTEX Application VALUES($23) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD party TO EDGE Application_Has_Party VALUES($0, $23) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+
+    LOAD party TO VERTEX Email VALUES($17) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD party TO EDGE Has_Email VALUES($0, $17) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+
+    LOAD party TO VERTEX Card VALUES($16) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD party TO EDGE Party_Has_Card VALUES($0, $16) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+
+    LOAD party TO VERTEX Full_Name VALUES($5) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD party TO EDGE Has_Full_Name VALUES($0, $5) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+
+    LOAD party TO VERTEX Phone VALUES($14) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD party TO EDGE Has_Phone VALUES($0, $14) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+
+    LOAD party TO VERTEX Account VALUES($18) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD party TO EDGE Party_Has_Account VALUES($0, $18) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+
+    LOAD party TO VERTEX Address VALUES(gsql_concat($7, " ", $9, " ", $10, " ", $11, " ", $12, " ", $13)) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD party TO EDGE Has_Address VALUES(gsql_concat($7, " ", $9, " ", $10, " ", $11, " ", $12, " ", $13), $0) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD party TO EDGE Located_In VALUES(gsql_concat($7, " ", $9, " ", $10, " ", $11, " ", $12, " ", $13) Address, $9 City) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD party TO EDGE Located_In VALUES($9 City, $10 State) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD party TO EDGE Assigned_To VALUES(gsql_concat($7, " ", $9, " ", $10, " ", $11, " ", $12, " ", $13) Address, $11 Zipcode) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD party TO EDGE Assigned_To VALUES($11 Zipcode, $9 City) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD party TO EDGE Assigned_To_County VALUES($11, $12) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD party TO EDGE Located_In_State VALUES($12, $10) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD party TO EDGE Located_In_Country VALUES($10, $13) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+
+}
+
+# 3. Run loading job
+RUN LOADING JOB loading_kyc_data
