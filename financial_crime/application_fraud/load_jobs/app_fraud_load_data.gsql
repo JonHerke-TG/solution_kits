@@ -1,0 +1,58 @@
+# 1. Use graph
+USE GRAPH Application_Fraud
+
+# 2. Create loading job
+CREATE LOADING JOB loading_application_data FOR GRAPH Application_Fraud {
+
+    DEFINE FILENAME application = "data/application_fraud.csv";
+    DEFINE FILENAME products = "data/products.csv";
+
+    LOAD application TO VERTEX Application VALUES($0, $1, $2, $3, $4, $5) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+
+    LOAD products TO VERTEX Product VALUES($0, $1, $2, $3) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD application TO EDGE Application_Has_Product VALUES($0, $18) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+
+    LOAD application TO VERTEX Device VALUES($26) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD application TO EDGE Application_Has_Device VALUES($0, $26) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+
+    LOAD application TO VERTEX IP VALUES($25) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD application TO EDGE Application_Has_IP VALUES($0, $25) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+
+    LOAD application TO VERTEX ID VALUES($23, $24) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD application TO EDGE Application_Has_ID VALUES($0, $23) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+
+    LOAD application TO VERTEX DOB VALUES($21) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD application TO EDGE Application_Has_DOB VALUES($0, $21) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+
+    LOAD application TO VERTEX Party VALUES($20) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD application TO EDGE Application_Has_Party VALUES($20, $0) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+
+    LOAD application TO VERTEX Email VALUES($19) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD application TO EDGE Application_Has_Email VALUES($0, $19) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+
+    LOAD application TO VERTEX Card VALUES($17) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD application TO EDGE Application_Has_Card VALUES($0, $17) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+
+    LOAD application TO VERTEX Full_Name VALUES($16) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD application TO EDGE Application_Has_Full_Name VALUES($0, $16) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+
+    LOAD application TO VERTEX Phone VALUES($14) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD application TO EDGE Application_Has_Phone VALUES($0, $14) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+
+    LOAD application TO VERTEX Account VALUES($22) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD application TO EDGE Application_Has_Account VALUES($0, $22) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+
+    LOAD application TO VERTEX Address VALUES(gsql_concat($7, " ", $9, " ", $10, " ", $11, " ", $12, " ", $13)) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD application TO EDGE Application_Has_Address VALUES($0, gsql_concat($7, " ", $9, " ", $10, " ", $11, " ", $12, " ", $13)) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD application TO EDGE Located_In VALUES(gsql_concat($7, " ", $9, " ", $10, " ", $11, " ", $12, " ", $13) Address, $9 City) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD application TO EDGE Located_In VALUES($9 City, $10 State) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD application TO EDGE Assigned_To VALUES(gsql_concat($7, " ", $9, " ", $10, " ", $11, " ", $12, " ", $13) Address, $11 Zipcode) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD application TO EDGE Assigned_To VALUES($11 Zipcode, $9 City) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD application TO EDGE Assigned_To_County VALUES($11, $12) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD application TO EDGE Located_In_State VALUES($12, $10) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+    LOAD application TO EDGE Located_In_Country VALUES($10, $13) USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+
+}
+
+# 3. Run loading job
+RUN LOADING JOB loading_application_data
