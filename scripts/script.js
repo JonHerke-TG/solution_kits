@@ -109,8 +109,6 @@ async function getSolution(dir) {
   content.metadata.images = await syncFolder(`${dir}/meta/images`, imageCacheControl);
   content.metadata.images.sort();
 
-  content.metadata.insightsApplications = await syncPattern(`${dir}/meta/Insights*.json`);
-
   content.metadata.provider = content.metadata.provider || "TigerGraph";
   content.metadata.algorithms = content.metadata.algorithms || [];
 
@@ -212,6 +210,13 @@ async function getSolutionDetail(dir, first, last) {
 
   const hasUDF = fs.existsSync(`${dir}/udfs`);
 
+  const insightsFiles = await globSync(`${dir}/meta/Insights*.json`);
+  const insightsApplications = [];
+  for (let insightsFile of insightsFiles) {
+    const application = JSON.parse(fs.readFileSync(`${insightsFile}`, "utf8"));
+    insightsApplications.push(application);
+  }
+
   return {
     schema,
     schemaJSON: schemaJSON ? JSON.parse(schemaJSON) : undefined,
@@ -222,6 +227,7 @@ async function getSolutionDetail(dir, first, last) {
     sampleLoadingJob,
     reset,
     hasUDF,
+    insightsApplications,
   };
 }
 
