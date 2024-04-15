@@ -1,0 +1,809 @@
+{
+  "error": false,
+  "message": "",
+  "results": {
+    "EdgeTypes": [
+      {
+        "Attributes": [
+          {
+            "AttributeName": "weight",
+            "AttributeType": {
+              "Name": "FLOAT"
+            }
+          }
+        ],
+        "Config": {},
+        "FromVertexTypeName": "Merchant",
+        "IsDirected": false,
+        "IsLocal": true,
+        "Name": "Merchant_Merchant",
+        "ToVertexTypeName": "Merchant"
+      },
+      {
+        "Attributes": [],
+        "Config": {},
+        "FromVertexTypeName": "Payment_Transaction",
+        "IsDirected": false,
+        "IsLocal": true,
+        "Name": "Merchant_Receive_Transaction",
+        "ToVertexTypeName": "Merchant"
+      },
+      {
+        "Attributes": [],
+        "Config": {},
+        "FromVertexTypeName": "Payment_Transaction",
+        "IsDirected": false,
+        "IsLocal": true,
+        "Name": "Card_Send_Transaction",
+        "ToVertexTypeName": "Card"
+      },
+      {
+        "Attributes": [
+          {
+            "AttributeName": "weight",
+            "AttributeType": {
+              "Name": "INT"
+            }
+          }
+        ],
+        "Config": {},
+        "FromVertexTypeName": "Card",
+        "IsDirected": false,
+        "IsLocal": true,
+        "Name": "Card_Card",
+        "ToVertexTypeName": "Card"
+      },
+      {
+        "Attributes": [],
+        "Config": {},
+        "FromVertexTypeName": "Merchant",
+        "IsDirected": false,
+        "IsLocal": true,
+        "Name": "Merchant_Assigned",
+        "ToVertexTypeName": "Merchant_Category"
+      },
+      {
+        "Attributes": [],
+        "Config": {
+          "REVERSE_EDGE": "reverse_Is_SubCategory"
+        },
+        "FromVertexTypeName": "Merchant_Category",
+        "IsDirected": true,
+        "IsLocal": true,
+        "Name": "Is_SubCategory",
+        "ToVertexTypeName": "Merchant_Category"
+      },
+      {
+        "Attributes": [],
+        "Config": {},
+        "FromVertexTypeName": "Card",
+        "IsDirected": false,
+        "IsLocal": true,
+        "Name": "Has_Interaction_With_Merchant",
+        "ToVertexTypeName": "Merchant"
+      },
+      {
+        "Attributes": [],
+        "Config": {},
+        "FromVertexTypeName": "Address",
+        "IsDirected": false,
+        "IsLocal": true,
+        "Name": "Has_Address",
+        "ToVertexTypeName": "Party"
+      },
+      {
+        "Attributes": [],
+        "Config": {},
+        "FromVertexTypeName": "Merchant",
+        "IsDirected": false,
+        "IsLocal": true,
+        "Name": "Is_Merchant",
+        "ToVertexTypeName": "Party"
+      },
+      {
+        "Attributes": [],
+        "Config": {},
+        "FromVertexTypeName": "Party",
+        "IsDirected": false,
+        "IsLocal": true,
+        "Name": "Party_Has_Card",
+        "ToVertexTypeName": "Card"
+      },
+      {
+        "Attributes": [],
+        "Config": {},
+        "FromVertexTypeName": "Party",
+        "IsDirected": false,
+        "IsLocal": true,
+        "Name": "Has_Phone",
+        "ToVertexTypeName": "Phone"
+      },
+      {
+        "Attributes": [],
+        "Config": {},
+        "FromVertexTypeName": "Party",
+        "IsDirected": false,
+        "IsLocal": true,
+        "Name": "Has_Email",
+        "ToVertexTypeName": "Email"
+      },
+      {
+        "Attributes": [],
+        "Config": {},
+        "EdgePairs": [
+          {
+            "From": "Party",
+            "To": "Community"
+          },
+          {
+            "From": "Merchant",
+            "To": "Community"
+          },
+          {
+            "From": "Card",
+            "To": "Community"
+          }
+        ],
+        "FromVertexTypeName": "*",
+        "IsDirected": false,
+        "IsLocal": true,
+        "Name": "Has_Community",
+        "ToVertexTypeName": "Community"
+      },
+      {
+        "Attributes": [],
+        "Config": {},
+        "FromVertexTypeName": "Party",
+        "IsDirected": false,
+        "IsLocal": true,
+        "Name": "Has_ID",
+        "ToVertexTypeName": "ID"
+      },
+      {
+        "Attributes": [],
+        "Config": {},
+        "FromVertexTypeName": "Party",
+        "IsDirected": false,
+        "IsLocal": true,
+        "Name": "Has_IP",
+        "ToVertexTypeName": "IP"
+      },
+      {
+        "Attributes": [],
+        "Config": {},
+        "FromVertexTypeName": "Party",
+        "IsDirected": false,
+        "IsLocal": true,
+        "Name": "Has_Device",
+        "ToVertexTypeName": "Device"
+      },
+      {
+        "Attributes": [],
+        "Config": {},
+        "EdgePairs": [
+          {
+            "From": "Address",
+            "To": "Zipcode"
+          },
+          {
+            "From": "Zipcode",
+            "To": "City"
+          }
+        ],
+        "FromVertexTypeName": "*",
+        "IsDirected": false,
+        "IsLocal": true,
+        "Name": "Assigned_To",
+        "ToVertexTypeName": "*"
+      },
+      {
+        "Attributes": [],
+        "Config": {},
+        "EdgePairs": [
+          {
+            "From": "Address",
+            "To": "City"
+          },
+          {
+            "From": "City",
+            "To": "State"
+          }
+        ],
+        "FromVertexTypeName": "*",
+        "IsDirected": false,
+        "IsLocal": true,
+        "Name": "Located_In",
+        "ToVertexTypeName": "*"
+      },
+      {
+        "Attributes": [],
+        "Config": {},
+        "FromVertexTypeName": "Party",
+        "IsDirected": false,
+        "IsLocal": true,
+        "Name": "Has_DOB",
+        "ToVertexTypeName": "DOB"
+      },
+      {
+        "Attributes": [],
+        "Config": {},
+        "FromVertexTypeName": "Party",
+        "IsDirected": false,
+        "IsLocal": true,
+        "Name": "Has_Full_Name",
+        "ToVertexTypeName": "Full_Name"
+      }
+    ],
+    "GraphName": "Transaction_Fraud",
+    "VertexTypes": [
+      {
+        "Attributes": [],
+        "Config": {
+          "PRIMARY_ID_AS_ATTRIBUTE": true,
+          "STATS": "OUTDEGREE_BY_EDGETYPE"
+        },
+        "IsLocal": true,
+        "Name": "Community",
+        "PrimaryId": {
+          "AttributeName": "cid",
+          "AttributeType": {
+            "Name": "UINT"
+          },
+          "PrimaryIdAsAttribute": true
+        }
+      },
+      {
+        "Attributes": [],
+        "Config": {
+          "PRIMARY_ID_AS_ATTRIBUTE": true,
+          "STATS": "OUTDEGREE_BY_EDGETYPE"
+        },
+        "IsLocal": true,
+        "Name": "Address",
+        "PrimaryId": {
+          "AttributeName": "address",
+          "AttributeType": {
+            "Name": "STRING"
+          },
+          "PrimaryIdAsAttribute": true
+        }
+      },
+      {
+        "Attributes": [
+          {
+            "AttributeName": "population",
+            "AttributeType": {
+              "Name": "INT"
+            }
+          }
+        ],
+        "Config": {
+          "PRIMARY_ID_AS_ATTRIBUTE": true,
+          "STATS": "OUTDEGREE_BY_EDGETYPE"
+        },
+        "IsLocal": true,
+        "Name": "City",
+        "PrimaryId": {
+          "AttributeName": "city",
+          "AttributeType": {
+            "Name": "STRING"
+          },
+          "PrimaryIdAsAttribute": true
+        }
+      },
+      {
+        "Attributes": [
+          {
+            "AttributeName": "pagerank",
+            "AttributeType": {
+              "Name": "FLOAT"
+            }
+          },
+          {
+            "AttributeName": "c_id",
+            "AttributeType": {
+              "Name": "INT"
+            }
+          },
+          {
+            "AttributeName": "c_size",
+            "AttributeType": {
+              "Name": "INT"
+            }
+          }
+        ],
+        "Config": {
+          "PRIMARY_ID_AS_ATTRIBUTE": true,
+          "STATS": "OUTDEGREE_BY_EDGETYPE"
+        },
+        "IsLocal": true,
+        "Name": "Merchant",
+        "PrimaryId": {
+          "AttributeName": "id",
+          "AttributeType": {
+            "Name": "STRING"
+          },
+          "PrimaryIdAsAttribute": true
+        }
+      },
+      {
+        "Attributes": [],
+        "Config": {
+          "PRIMARY_ID_AS_ATTRIBUTE": true,
+          "STATS": "OUTDEGREE_BY_EDGETYPE"
+        },
+        "IsLocal": true,
+        "Name": "State",
+        "PrimaryId": {
+          "AttributeName": "id",
+          "AttributeType": {
+            "Name": "STRING"
+          },
+          "PrimaryIdAsAttribute": true
+        }
+      },
+      {
+        "Attributes": [],
+        "Config": {
+          "PRIMARY_ID_AS_ATTRIBUTE": true,
+          "STATS": "OUTDEGREE_BY_EDGETYPE"
+        },
+        "IsLocal": true,
+        "Name": "Zipcode",
+        "PrimaryId": {
+          "AttributeName": "id",
+          "AttributeType": {
+            "Name": "STRING"
+          },
+          "PrimaryIdAsAttribute": true
+        }
+      },
+      {
+        "Attributes": [
+          {
+            "AttributeName": "transaction_time",
+            "AttributeType": {
+              "Name": "DATETIME"
+            }
+          },
+          {
+            "AttributeName": "amount",
+            "AttributeType": {
+              "Name": "DOUBLE"
+            }
+          },
+          {
+            "AttributeName": "is_fraud",
+            "AttributeType": {
+              "Name": "INT"
+            }
+          },
+          {
+            "AttributeName": "unix_time",
+            "AttributeType": {
+              "Name": "UINT"
+            }
+          },
+          {
+            "AttributeName": "shortest_path_length",
+            "AttributeType": {
+              "Name": "INT"
+            }
+          },
+          {
+            "AttributeName": "max_txn_amt_interval",
+            "AttributeType": {
+              "Name": "FLOAT"
+            }
+          },
+          {
+            "AttributeName": "max_txn_cnt_interval",
+            "AttributeType": {
+              "Name": "INT"
+            }
+          },
+          {
+            "AttributeName": "cnt_repeated_card",
+            "AttributeType": {
+              "Name": "INT"
+            }
+          },
+          {
+            "AttributeName": "com_mer_txn_cnt",
+            "AttributeType": {
+              "Name": "INT"
+            }
+          },
+          {
+            "AttributeName": "com_mer_txn_total_amt",
+            "AttributeType": {
+              "Name": "FLOAT"
+            }
+          },
+          {
+            "AttributeName": "com_mer_txn_avg_amt",
+            "AttributeType": {
+              "Name": "FLOAT"
+            }
+          },
+          {
+            "AttributeName": "com_mer_txn_max_amt",
+            "AttributeType": {
+              "Name": "FLOAT"
+            }
+          },
+          {
+            "AttributeName": "com_mer_txn_min_amt",
+            "AttributeType": {
+              "Name": "FLOAT"
+            }
+          },
+          {
+            "AttributeName": "com_cd_txn_cnt",
+            "AttributeType": {
+              "Name": "INT"
+            }
+          },
+          {
+            "AttributeName": "com_cd_txn_total_amt",
+            "AttributeType": {
+              "Name": "FLOAT"
+            }
+          },
+          {
+            "AttributeName": "com_cd_txn_avg_amt",
+            "AttributeType": {
+              "Name": "FLOAT"
+            }
+          },
+          {
+            "AttributeName": "com_cd_txn_max_amt",
+            "AttributeType": {
+              "Name": "FLOAT"
+            }
+          },
+          {
+            "AttributeName": "com_cd_txn_min_amt",
+            "AttributeType": {
+              "Name": "FLOAT"
+            }
+          },
+          {
+            "AttributeName": "indegree",
+            "AttributeType": {
+              "Name": "INT"
+            }
+          },
+          {
+            "AttributeName": "outdegree",
+            "AttributeType": {
+              "Name": "INT"
+            }
+          },
+          {
+            "AttributeName": "mer_cat",
+            "AttributeType": {
+              "Name": "STRING"
+            }
+          },
+          {
+            "AttributeName": "mer_cat_cnt",
+            "AttributeType": {
+              "Name": "INT"
+            }
+          },
+          {
+            "AttributeName": "mer_cat_total_amt",
+            "AttributeType": {
+              "Name": "FLOAT"
+            }
+          },
+          {
+            "AttributeName": "mer_cat_avg_amt",
+            "AttributeType": {
+              "Name": "FLOAT"
+            }
+          },
+          {
+            "AttributeName": "mer_cat_max_amt",
+            "AttributeType": {
+              "Name": "FLOAT"
+            }
+          },
+          {
+            "AttributeName": "mer_cat_min_amt",
+            "AttributeType": {
+              "Name": "FLOAT"
+            }
+          },
+          {
+            "AttributeName": "mer_pagerank",
+            "AttributeType": {
+              "Name": "FLOAT"
+            }
+          },
+          {
+            "AttributeName": "cd_pagerank",
+            "AttributeType": {
+              "Name": "FLOAT"
+            }
+          },
+          {
+            "AttributeName": "mer_com_size",
+            "AttributeType": {
+              "Name": "INT"
+            }
+          },
+          {
+            "AttributeName": "cd_com_size",
+            "AttributeType": {
+              "Name": "INT"
+            }
+          }
+        ],
+        "Config": {
+          "PRIMARY_ID_AS_ATTRIBUTE": true,
+          "STATS": "OUTDEGREE_BY_EDGETYPE"
+        },
+        "IsLocal": true,
+        "Name": "Payment_Transaction",
+        "PrimaryId": {
+          "AttributeName": "id",
+          "AttributeType": {
+            "Name": "STRING"
+          },
+          "PrimaryIdAsAttribute": true
+        }
+      },
+      {
+        "Attributes": [
+          {
+            "AttributeName": "is_fraud",
+            "AttributeType": {
+              "Name": "INT"
+            }
+          },
+          {
+            "AttributeName": "card_type",
+            "AttributeType": {
+              "Name": "STRING"
+            }
+          },
+          {
+            "AttributeName": "pagerank",
+            "AttributeType": {
+              "Name": "FLOAT"
+            }
+          },
+          {
+            "AttributeName": "c_id",
+            "AttributeType": {
+              "Name": "INT"
+            }
+          },
+          {
+            "AttributeName": "c_size",
+            "AttributeType": {
+              "Name": "INT"
+            }
+          }
+        ],
+        "Config": {
+          "PRIMARY_ID_AS_ATTRIBUTE": true,
+          "STATS": "OUTDEGREE_BY_EDGETYPE"
+        },
+        "IsLocal": true,
+        "Name": "Card",
+        "PrimaryId": {
+          "AttributeName": "card_number",
+          "AttributeType": {
+            "Name": "INT"
+          },
+          "PrimaryIdAsAttribute": true
+        }
+      },
+      {
+        "Attributes": [],
+        "Config": {
+          "PRIMARY_ID_AS_ATTRIBUTE": true,
+          "STATS": "OUTDEGREE_BY_EDGETYPE"
+        },
+        "IsLocal": true,
+        "Name": "Merchant_Category",
+        "PrimaryId": {
+          "AttributeName": "category",
+          "AttributeType": {
+            "Name": "STRING"
+          },
+          "PrimaryIdAsAttribute": true
+        }
+      },
+      {
+        "Attributes": [
+          {
+            "AttributeName": "is_fraud",
+            "AttributeType": {
+              "Name": "INT"
+            }
+          },
+          {
+            "AttributeName": "gender",
+            "AttributeType": {
+              "Name": "STRING"
+            }
+          },
+          {
+            "AttributeName": "dob",
+            "AttributeType": {
+              "Name": "DATETIME"
+            }
+          },
+          {
+            "AttributeName": "party_type",
+            "AttributeType": {
+              "Name": "STRING"
+            }
+          },
+          {
+            "AttributeName": "name",
+            "AttributeType": {
+              "Name": "STRING"
+            }
+          },
+          {
+            "AttributeName": "created_at",
+            "AttributeType": {
+              "Name": "UINT"
+            }
+          }
+        ],
+        "Config": {
+          "PRIMARY_ID_AS_ATTRIBUTE": true,
+          "STATS": "OUTDEGREE_BY_EDGETYPE"
+        },
+        "IsLocal": true,
+        "Name": "Party",
+        "PrimaryId": {
+          "AttributeName": "id",
+          "AttributeType": {
+            "Name": "STRING"
+          },
+          "PrimaryIdAsAttribute": true
+        }
+      },
+      {
+        "Attributes": [],
+        "Config": {
+          "PRIMARY_ID_AS_ATTRIBUTE": true,
+          "STATS": "OUTDEGREE_BY_EDGETYPE"
+        },
+        "IsLocal": true,
+        "Name": "Phone",
+        "PrimaryId": {
+          "AttributeName": "phone_number",
+          "AttributeType": {
+            "Name": "STRING"
+          },
+          "PrimaryIdAsAttribute": true
+        }
+      },
+      {
+        "Attributes": [],
+        "Config": {
+          "PRIMARY_ID_AS_ATTRIBUTE": true,
+          "STATS": "OUTDEGREE_BY_EDGETYPE"
+        },
+        "IsLocal": true,
+        "Name": "Email",
+        "PrimaryId": {
+          "AttributeName": "email",
+          "AttributeType": {
+            "Name": "STRING"
+          },
+          "PrimaryIdAsAttribute": true
+        }
+      },
+      {
+        "Attributes": [
+          {
+            "AttributeName": "is_blocked",
+            "AttributeType": {
+              "Name": "BOOL"
+            }
+          }
+        ],
+        "Config": {
+          "PRIMARY_ID_AS_ATTRIBUTE": true,
+          "STATS": "OUTDEGREE_BY_EDGETYPE"
+        },
+        "IsLocal": true,
+        "Name": "IP",
+        "PrimaryId": {
+          "AttributeName": "id",
+          "AttributeType": {
+            "Name": "STRING"
+          },
+          "PrimaryIdAsAttribute": true
+        }
+      },
+      {
+        "Attributes": [
+          {
+            "AttributeName": "is_blocked",
+            "AttributeType": {
+              "Name": "BOOL"
+            }
+          }
+        ],
+        "Config": {
+          "PRIMARY_ID_AS_ATTRIBUTE": true,
+          "STATS": "OUTDEGREE_BY_EDGETYPE"
+        },
+        "IsLocal": true,
+        "Name": "Device",
+        "PrimaryId": {
+          "AttributeName": "id",
+          "AttributeType": {
+            "Name": "STRING"
+          },
+          "PrimaryIdAsAttribute": true
+        }
+      },
+      {
+        "Attributes": [
+          {
+            "AttributeName": "id_type",
+            "AttributeType": {
+              "Name": "STRING"
+            }
+          }
+        ],
+        "Config": {
+          "PRIMARY_ID_AS_ATTRIBUTE": true,
+          "STATS": "OUTDEGREE_BY_EDGETYPE"
+        },
+        "IsLocal": true,
+        "Name": "ID",
+        "PrimaryId": {
+          "AttributeName": "id",
+          "AttributeType": {
+            "Name": "STRING"
+          },
+          "PrimaryIdAsAttribute": true
+        }
+      },
+      {
+        "Attributes": [],
+        "Config": {
+          "PRIMARY_ID_AS_ATTRIBUTE": true,
+          "STATS": "OUTDEGREE_BY_EDGETYPE"
+        },
+        "IsLocal": true,
+        "Name": "Full_Name",
+        "PrimaryId": {
+          "AttributeName": "name",
+          "AttributeType": {
+            "Name": "STRING"
+          },
+          "PrimaryIdAsAttribute": true
+        }
+      },
+      {
+        "Attributes": [],
+        "Config": {
+          "PRIMARY_ID_AS_ATTRIBUTE": true,
+          "STATS": "OUTDEGREE_BY_EDGETYPE"
+        },
+        "IsLocal": true,
+        "Name": "DOB",
+        "PrimaryId": {
+          "AttributeName": "dob",
+          "AttributeType": {
+            "Name": "DATETIME"
+          },
+          "PrimaryIdAsAttribute": true
+        }
+      }
+    ]
+  }
+}
