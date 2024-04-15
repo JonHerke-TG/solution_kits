@@ -77,15 +77,6 @@ async function syncFolder(folder, cacheControl = disableCacheControl) {
   return results;
 }
 
-async function syncPattern(pattern, cacheControl = disableCacheControl) {
-  const files = globSync(pattern);
-  let results = [];
-  for (let file of files) {
-    results.push(await syncFile(file, cacheControl));
-  }
-  return results;
-}
-
 function getAllSolutions() {
   const metaFiles = globSync("**/meta/meta.yml", {
     ignore: ["solution_kits/scripts/**"],
@@ -163,6 +154,23 @@ function concatFiles(files) {
   return content;
 }
 
+// we need to concat loading job files separately
+// replace bucket name in loading job files
+function concatLoadingFiles(files) {
+  const fileContents = files
+    .map((file) => fs.readFileSync(file, "utf8"))
+    .map((content) => content.replaceAll("tigergraph-solution-kits", getBucketName()));
+
+  let content = "";
+  for (let i = 0; i < files.length; i++) {
+    content += "#File: " + files[i] + "\n";
+    content += fileContents[i];
+    content += "\n\n";
+  }
+
+  return content;
+}
+
 async function getSolutionDetail(dir, first, last) {
   const schemaFiles = globSync(`${dir}/schema/*.gsql`);
   const schema = concatFiles(schemaFiles);
@@ -200,7 +208,7 @@ async function getSolutionDetail(dir, first, last) {
   const query = concatFiles(allQueryFiles);
 
   const sampleLoadingJobFiles = globSync(`${dir}/loading_job/*.gsql`);
-  const sampleLoadingJob = concatFiles(sampleLoadingJobFiles);
+  const sampleLoadingJob = concatLoadingFiles(sampleLoadingJobFiles);
 
   const resetFiles = globSync(`${dir}/reset/*.gsql`);
   const reset = concatFiles(resetFiles);
