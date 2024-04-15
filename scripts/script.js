@@ -221,7 +221,7 @@ async function getSolutionDetail(dir, first, last) {
     schema,
     schemaJSON: schemaJSON ? JSON.parse(schemaJSON) : undefined,
     styleJSON: styleJSON ? JSON.parse(styleJSON) : undefined,
-    queriesDocs: queriesDocs ? queriesDocs : [],
+    queriesDocs: queriesDocs ? [] : [],
 
     query,
     sampleLoadingJob,
