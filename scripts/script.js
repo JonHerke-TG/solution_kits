@@ -8,13 +8,17 @@ import mime from "mime";
 import zlib from "zlib";
 import { renderMarkdown } from "./markdown.js";
 
-const bucketName = "tigergraph-solution-kits";
+const defaultBucketName = "tigergraph-solution-kits";
 const disableCacheControl = "max-age=0,no-cache,no-store";
 const imageCacheControl = "max-age=86400"; // cache image for  1 day
 
+function getBucketName() {
+  return process.env.BUCKET_NAME || defaultBucketName();
+}
+
 const s3 = new AWS.S3();
 const commonBucketConfig = {
-  Bucket: bucketName,
+  Bucket: getBucketName(),
 };
 
 async function syncFile(file, cacheControl = disableCacheControl) {
@@ -30,7 +34,7 @@ async function syncFile(file, cacheControl = disableCacheControl) {
   try {
     const object = await s3
       .headObject({
-        Bucket: bucketName,
+        Bucket: getBucketName(),
         Key: file,
       })
       .promise();
@@ -58,7 +62,7 @@ async function syncFile(file, cacheControl = disableCacheControl) {
     }
   }
 
-  return `https://${bucketName}.s3.us-west-1.amazonaws.com/${file}`;
+  return `https://${getBucketName()}.s3.us-west-1.amazonaws.com/${file}`;
 }
 
 async function syncFolder(folder, cacheControl = disableCacheControl) {
