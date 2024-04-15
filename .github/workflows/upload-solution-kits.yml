@@ -1,0 +1,27 @@
+name: Upload Solution Kits
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  upload-solutions-kits:
+    name: Upload Solution Kits
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: 🏗 Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Upload
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE: ${{ vars.AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE }}
+        run: |
+          npm install --prefix scripts    
+          node scripts/script.js

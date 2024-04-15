@@ -1,0 +1,192 @@
+{
+  "error": false,
+  "message": "",
+  "results": {
+    "vertexStyles": {
+      "Address": {
+        "fillColor": "#d62728",
+        "other": {},
+        "x": 521.5160159832976,
+        "y": 338.94437781693455
+      },
+      "Card": {
+        "fillColor": "#17becf",
+        "other": {},
+        "x": 521.8136301747141,
+        "y": 905.0797014543828
+      },
+      "City": {
+        "fillColor": "#9467bd",
+        "other": {},
+        "x": 360.6588032611767,
+        "y": 364.64049928026503
+      },
+      "Community": {
+        "fillColor": "#2ca02c",
+        "other": {},
+        "x": 223.5068639928419,
+        "y": 501.19721016576653
+      },
+      "DOB": {
+        "fillColor": "#dbdb8d",
+        "other": {},
+        "x": 908.7637832820545,
+        "y": 215.0406949022039
+      },
+      "Device": {
+        "fillColor": "#c49c94",
+        "other": {},
+        "x": 981.2752232701242,
+        "y": 452.3910436314831
+      },
+      "Email": {
+        "fillColor": "#ff9896",
+        "other": {},
+        "x": 686.3549247245071,
+        "y": 901.6932338181276
+      },
+      "Full_Name": {
+        "fillColor": "#c7c7c7",
+        "other": {},
+        "x": 881.3744280005965,
+        "y": 900
+      },
+      "ID": {
+        "fillColor": "#f7b6d2",
+        "other": {},
+        "x": 900,
+        "y": 600
+      },
+      "IP": {
+        "fillColor": "#c5b0d5",
+        "other": {},
+        "x": 688.3457727340513,
+        "y": 79.58198945199672
+      },
+      "Merchant": {
+        "fillColor": "#8c564b",
+        "other": {},
+        "x": 223.50686399284186,
+        "y": 901.6932338181276
+      },
+      "Merchant_Category": {
+        "fillColor": "#aec7e8",
+        "other": {},
+        "x": 213.94268946690954,
+        "y": 1144.6260610542508
+      },
+      "Party": {
+        "fillColor": "#ffbb78",
+        "other": {},
+        "x": 603.3864676362551,
+        "y": 560.7580079916487
+      },
+      "Payment_Transaction": {
+        "fillColor": "#bcbd22",
+        "other": {},
+        "x": 499.80159053905555,
+        "y": 1179.0859657996357
+      },
+      "Phone": {
+        "fillColor": "#98df8a",
+        "other": {},
+        "x": 1026.6949221681527,
+        "y": 787.9489538121625
+      },
+      "State": {
+        "fillColor": "#e377c2",
+        "other": {},
+        "x": 195.01950327608938,
+        "y": 213.3474610840764
+      },
+      "Zipcode": {
+        "fillColor": "#7f7f7f",
+        "other": {},
+        "x": 482.86925235777966,
+        "y": 108.66457855158231
+      }
+    },
+    "edgeStyles": {
+      "Assigned_To": {
+        "fillColor": "#e7969c",
+        "other": {}
+      },
+      "Card_Card": {
+        "fillColor": "#6b6ecf",
+        "other": {}
+      },
+      "Card_Send_Transaction": {
+        "fillColor": "#5254a3",
+        "other": {}
+      },
+      "Has_Address": {
+        "fillColor": "#b5cf6b",
+        "other": {}
+      },
+      "Has_Community": {
+        "fillColor": "#e7cb94",
+        "other": {}
+      },
+      "Has_DOB": {
+        "fillColor": "#a55194",
+        "other": {}
+      },
+      "Has_Device": {
+        "fillColor": "#d6616b",
+        "other": {}
+      },
+      "Has_Email": {
+        "fillColor": "#e7ba52",
+        "other": {}
+      },
+      "Has_Full_Name": {
+        "fillColor": "#ce6dbd",
+        "other": {}
+      },
+      "Has_ID": {
+        "fillColor": "#843c39",
+        "other": {}
+      },
+      "Has_IP": {
+        "fillColor": "#ad494a",
+        "other": {}
+      },
+      "Has_Interaction_With_Merchant": {
+        "fillColor": "#8ca252",
+        "other": {}
+      },
+      "Has_Phone": {
+        "fillColor": "#bd9e39",
+        "other": {}
+      },
+      "Is_Merchant": {
+        "fillColor": "#cedb9c",
+        "other": {}
+      },
+      "Is_SubCategory": {
+        "fillColor": "#637939",
+        "other": {}
+      },
+      "Located_In": {
+        "fillColor": "#7b4173",
+        "other": {}
+      },
+      "Merchant_Assigned": {
+        "fillColor": "#9c9ede",
+        "other": {}
+      },
+      "Merchant_Merchant": {
+        "fillColor": "#9edae5",
+        "other": {}
+      },
+      "Merchant_Receive_Transaction": {
+        "fillColor": "#393b79",
+        "other": {}
+      },
+      "Party_Has_Card": {
+        "fillColor": "#8c6d31",
+        "other": {}
+      }
+    }
+  }
+}

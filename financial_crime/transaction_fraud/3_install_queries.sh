@@ -11,8 +11,8 @@ gsql -g Transaction_Fraud INSTALL QUERY mer_shortest_path_length
 
 # Iterate over each .gsql file in the directory
 for file in "$QUERY_DIR"/*.gsql; do
-    # Skip the mer_shortest_path_length.gsql file
-    if [[ "$(basename "$file")" != "mer_shortest_path_length.gsql" ]]; then
+    # Skip the mer_shortest_path_length.gsql file and install_query.gsql file
+    if [[ "$(basename "$file")" != "mer_shortest_path_length.gsql" &&  "$(basename "$file")" != "install_query.gsql" ]]; then
         echo "Running $file..."
         gsql -g "$GRAPH_NAME" "$file"
     else

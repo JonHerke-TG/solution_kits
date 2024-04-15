@@ -1,7 +1,15 @@
 USE GRAPH Transaction_Fraud
 
+CREATE DATA_SOURCE s1 = """{
+    "type": "s3",
+    "file.reader.settings.fs.s3a.aws.credentials.provider": "org.apache.hadoop.fs.s3a.AnonymousAWSCredentialsProvider",
+    "access.key": "none",
+    "secret.key": "none"
+}""" FOR GRAPH Transaction_Fraud
+
 CREATE LOADING JOB loading_data FOR GRAPH Transaction_Fraud {
-      DEFINE FILENAME MyDataSource = "data/";
+      DEFINE FILENAME MyDataSource="$s1:s3://tigergraph-solution-kits/financial_crime/transaction_fraud/data/";
+      
       LOAD MyDataSource TO VERTEX Merchant_Category VALUES($22) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
       LOAD MyDataSource TO VERTEX Merchant VALUES($25, _, _, _) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
       LOAD MyDataSource TO VERTEX Payment_Transaction VALUES($20, $28, $23, $24, $21, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _) USING SEPARATOR="|", HEADER="true", EOL="\n", QUOTE="double";
