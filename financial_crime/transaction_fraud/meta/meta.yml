@@ -12,5 +12,6 @@ metadata:
 queries:
   first:
     - use_graph.gsql
+    - mer_shortest_path_length.gsql
   last:
     - install_query.gsql
