@@ -70,16 +70,16 @@
         },
         {
             "function_header": "incremental_party_unify",
-            "description": "This query associates Applications unable to be matched to any existing Application using incremental_party_match into its own respective Connected_Component community vertex so it can be eligible for weighted weakly connected components matching in near real time",
-            "docstring": "This query associates Applications to their own Connected_Component community vertex. It is used in the near real time matching flow when any new Application sent to incremental_party_match returns entity_resolution false. Run the query with `runInstalledQuery('incremental_application_unify', params={'applications': 'INSERT_APPLICATIONS_HERE' })`",
+            "description": "This query associates Parties unable to be matched to any existing Party using incremental_party_match into its own respective Connected_Component community vertex so it can be eligible for weighted weakly connected components matching in near real time",
+            "docstring": "This query associates Parties to their own Connected_Component community vertex. It is used in the near real time matching flow when any new Party sent to incremental_party_match returns entity_resolution false. Run the query with `runInstalledQuery('incremental_party_unify', params={'partys': 'INSERT_APPLICATIONS_HERE' })`",
             "param_types": {
-                "applications": "Set of Party vertices"
+                "partys": "Set of Party vertices"
             }
         },
         {
             "function_header": "get_party_cc_features",
             "description": "This query returns graph features for the communities created using the weighted weakly connected components matching logic for any given party Party in near real time",
-            "docstring": "This query returns graph features for a given Party's associated Connected_Component community vertex for any PII data with a maximum outdegree of connections including distinct Party node count, fraud Party node count, Name node count, Name connections count, Name only connections count, DOB node count, DOB connections count, DOB only connections count, Email node count, Email connections count, Email only connections count, Phone node count, Phone connections count, Phone only connections count, Address node count, Address connections count, Address only connections count, IP node count, IP connections count, IP only connections count, ID node count, ID connections count, ID only connections count, Device node count, Device connections count, Device only connections count, Application node count, Application connections count, Application only connections count, Account node count, Account connections count, Account only connections count, Card node count, Card connections count, Card only connections count. It is used in the near real time matching flow to augment a decision model with graph features when any new Party sent to incremental_party_match returns entity_resolution true. Run the query with `runInstalledQuery('get_party_cc_features', params={'party': 'INSERT_PARTY_HERE', 'connections': 'INSERT_CONNECTIONS_HERE'})` connections defaults to 25000. ",
+            "docstring": "This query returns graph features for a given Party's associated Connected_Component community vertex for any PII data with a maximum outdegree of connections including distinct Party node count, fraud Party node count, Name node count, Name connections count, Name only connections count, DOB node count, DOB connections count, DOB only connections count, Email node count, Email connections count, Email only connections count, Phone node count, Phone connections count, Phone only connections count, Address node count, Address connections count, Address only connections count, IP node count, IP connections count, IP only connections count, ID node count, ID connections count, ID only connections count, Device node count, Device connections count, Device only connections count, Party node count, Party connections count, Party only connections count, Account node count, Account connections count, Account only connections count, Card node count, Card connections count, Card only connections count. It is used in the near real time matching flow to augment a decision model with graph features when any new Party sent to incremental_party_match returns entity_resolution true. Run the query with `runInstalledQuery('get_party_cc_features', params={'party': 'INSERT_PARTY_HERE', 'connections': 'INSERT_CONNECTIONS_HERE'})` connections defaults to 25000. ",
             "param_types": {
                 "party": "Party vertex",
                 "connections": "int"
@@ -93,6 +93,31 @@
                 "input": "Party vertex",
                 "depth": "int"
             }
+        },
+        {
+          "function_header": "get_party_fraud_status",
+          "description": "This query returns the integer is_fraud attribute for any given Party in near real time",
+          "docstring": "This query returns the integer is_fraud attribute for any given Party vertice(s) in near real time. Run the query with `runInstalledQuery('get_party_fraud_status', params={'parties': 'INSERT_APLICATIONS_HERE'})`",
+          "param_types": {
+              "parties" : "Set of Party vertices"
+          }
+        },
+        {
+          "function_header": "set_party_fraud_status",
+          "description": "This query sets the integer is_fraud attribute for any given Party to the provided is_fraud integer value in near real time",
+          "docstring": "This query sets the integer is_fraud attribute for any given Party vertex to the provided is_fraud integer value in near real time. Run the query with `runInstalledQuery('set_party_fraud_status', params={'party': 'INSERT_APPLICATIONS_HERE', 'fraud_status': 'INSERT_FRAUD_STATUS_HERE'})`",
+          "param_types": {
+              "party" : "Party vertex",
+              "fraud_status": "int"
+          }
+        },
+        {
+          "function_header": "output_party_cc_to_file",
+          "description": "This query outputs a file containing a mapping of all Party vertices to their respective Connected_Component community vertex",
+          "docstring": "This query outputs a file at the provided string output_file_path location mapping all Party vertices to their respective Connected_Component community vertex. Run the query with `runInstalledQuery('output_party_cc_to_file', params={'output_file_path': 'INSERT_OUTPUT_FILE_PATH_HERE'})` output_file_path defaults to '/home/tigergraph/gsql_output/party_cc_output.txt'. ",
+          "param_types": {
+              "output_file_path" : "string"
+          }
         }
     ]
 }
