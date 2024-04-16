@@ -71,14 +71,14 @@
                     "graphName": "Transaction_Fraud",
                     "id": "9nZx95J9WuSJcpuuC5tKPP",
                     "patternLimit": 300,
-                    "query": "INTERPRET QUERY() FOR GRAPH Transaction_Fraud {\n  TYPEDEF TUPLE <STRING Category, FLOAT Percentage> entry;\n  ListAccum<entry> @@Stats;\n  SumAccum<FLOAT> @@total, @@normal;\n  FLOAT recall = 0.78;\n  rlt = SELECT s \n        FROM Payment_Transaction:s \n        POST-ACCUM @@total += s.amount,\n        IF s.is_fraud ==0 THEN @@normal += s.amount END;\n    \n  \n\n  //@@Stats += entry(\"Total Transaction Amount\", @@total);\n  //@@Stats += entry(\"Normal Transaction Amount\", @@normal);\n  @@Stats += entry(\"Total Fraud Losses\", @@total -@@normal);\n  @@Stats += entry(\"Revenue Generated\", (@@total -@@normal)*recall);\n  \n    PRINT @@Stats;\n   \n}",
+                    "query": "INTERPRET QUERY() FOR GRAPH Transaction_Fraud {\n  TYPEDEF TUPLE <STRING Category, FLOAT Percentage> entry;\n  ListAccum<entry> @@Stats;\n  SumAccum<FLOAT> @@total, @@normal;\n  FLOAT recall = 0.78;\n  rlt = SELECT s \n        FROM Payment_Transaction:s \n        POST-ACCUM @@total += s.amount,\n        IF s.is_fraud ==0 THEN @@normal += s.amount END;\n    \n  \n\n  //@@Stats += entry(\"Total Transaction Amount\", @@total);\n  //@@Stats += entry(\"Normal Transaction Amount\", @@normal);\n  @@Stats += entry(\"Total Fraud Losses\", @@total -@@normal);\n  @@Stats += entry(\"Fraud Loss Saved\", (@@total -@@normal)*recall);\n  \n    PRINT @@Stats;\n   \n}",
                     "queryType": "interactive",
                     "refreshRate": 900,
                     "searchPattern": [],
                     "staticData": "{}",
                     "title": "Live Revenue and Fraud Loss Monitoring Dashboard",
-                    "type": "pie",
-                    "version": "1712787766227752712"
+                    "type": "bar",
+                    "version": "1713216430500232702"
                 },
                 "jm9jf9Rj8UNTJpCYsPSpcu": {
                     "chartSettings": {
@@ -199,30 +199,12 @@
             "layouts": {
                 "md": [
                     {
-                        "h": 21,
-                        "i": "jm9jf9Rj8UNTJpCYsPSpcu",
-                        "moved": false,
-                        "static": false,
-                        "w": 7,
-                        "x": 0,
-                        "y": 0
-                    },
-                    {
                         "h": 15,
-                        "i": "xih3vLW1JodnAvsN7wYLgm",
+                        "i": "8Q74gGcRSfhEeeeDyRjWCS",
                         "moved": false,
                         "static": false,
-                        "w": 3,
-                        "x": 0,
-                        "y": 21
-                    },
-                    {
-                        "h": 15,
-                        "i": "k1Jw7Z1dB6gQFHDiwYeguV",
-                        "moved": false,
-                        "static": false,
-                        "w": 4,
-                        "x": 3,
+                        "w": 5,
+                        "x": 7,
                         "y": 21
                     },
                     {
@@ -235,18 +217,36 @@
                         "y": 0
                     },
                     {
-                        "h": 15,
-                        "i": "8Q74gGcRSfhEeeeDyRjWCS",
+                        "h": 21,
+                        "i": "jm9jf9Rj8UNTJpCYsPSpcu",
                         "moved": false,
                         "static": false,
-                        "w": 5,
-                        "x": 7,
+                        "w": 7,
+                        "x": 0,
+                        "y": 0
+                    },
+                    {
+                        "h": 15,
+                        "i": "k1Jw7Z1dB6gQFHDiwYeguV",
+                        "moved": false,
+                        "static": false,
+                        "w": 4,
+                        "x": 3,
+                        "y": 21
+                    },
+                    {
+                        "h": 15,
+                        "i": "xih3vLW1JodnAvsN7wYLgm",
+                        "moved": false,
+                        "static": false,
+                        "w": 3,
+                        "x": 0,
                         "y": 21
                     }
                 ]
             },
             "title": "ROI",
-            "version": "1712625133267414210",
+            "version": "1713131124408515832",
             "weight": 10
         }
     ],

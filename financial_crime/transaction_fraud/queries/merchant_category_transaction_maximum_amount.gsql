@@ -1,0 +1,49 @@
+USE GRAPH Transaction_Fraud
+CREATE DISTRIBUTED QUERY merchant_category_transaction_maximum_amount(
+//STRING file_path = "/home/tigergraph/gsql_output/community_count_transaction.csv",
+//bool save_csv=false, 
+  bool print_results=false
+) FOR GRAPH Transaction_Fraud { 
+ /**
+   * Feature:
+   *   This query counts the maximum amount of transactions for each merchant category. 
+   *   Results are then updated to feature attribute of Payment_Transaction vertices.
+   *
+   * Parameters:
+   *   - file_path: Specifies the path to the output CSV file where the results will be saved if `save_csv` is true.
+   *   - save_csv: A boolean parameter that determines whether the results are saved to a CSV file at `file_path`.
+   *   - print_results: A boolean parameter that controls whether the results are printed to the console.
+   *
+   * Output:
+   *   Depending on the boolean flags provided:
+   *   - If `save_csv` is true, the query outputs a CSV file at `file_path` 
+   *   - If `print_results` is true, the query prints the results directly to the console.
+   */
+ 
+  MaxAccum<FLOAT> @txn_max_amount;
+  //FILE output_file(file_path);
+  MaxAccum<FLOAT> @txn_amt;
+  MapAccum<STRING,MinAccum<Float>> @txn_map;
+  
+   mer_cat = 
+    SELECT c
+    FROM  Merchant_Category:c -(Merchant_Assigned:e1)- Merchant -(:e2)-  Payment_Transaction:t 
+    ACCUM c.@txn_map += (t.id -> t.amount)
+    POST-ACCUM FOREACH (tid,amount) in c.@txn_map DO
+    c.@txn_amt += amount END;
+  
+   mer_cat = 
+    SELECT c
+    FROM  Merchant_Category:c -(Merchant_Assigned:e1)- Merchant -(:e2)-  Payment_Transaction:t 
+    ACCUM t.@txn_max_amount += c.@txn_amt
+    POST-ACCUM t.setAttr("mer_cat_max_amt",t.@txn_max_amount);
+  
+   IF print_results == TRUE THEN
+   PRINT mer_cat[mer_cat.@txn_amt]; 
+   END;
+  /*
+  IF save_csv == TRUE THEN
+  PRINT community.@count.size() TO_CSV output_file;
+  END;
+  */
+}

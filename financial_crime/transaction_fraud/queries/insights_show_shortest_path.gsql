@@ -1,0 +1,60 @@
+USE GRAPH Transaction_Fraud
+CREATE DISTRIBUTED QUERY insights_show_shortest_path(
+Vertex<Payment_Transaction> ver,
+INT print_number) FOR GRAPH Transaction_Fraud { 
+  
+  SetAccum<EDGE> @@fraud;
+  OrAccum @or_visted;
+  ListAccum<VERTEX> @path_list;
+  SetAccum<VERTEX> @@display;
+  SumAccum<INT>  @@is_fraud, @@min_dist;
+  @@min_dist = 0;
+  Source ={ver};
+  // if input vertex is fraudulent, only print the input vertex
+  tmp = SELECT s FROM Source:s
+        POST-ACCUM @@is_fraud += s.is_fraud,
+                   s.@path_list =s;
+  fraud = SELECT s 
+      FROM Payment_Transaction:s 
+      WHERE s.is_fraud ==1;
+  ResultSet = {ver};
+  
+  While (@@is_fraud == 0) DO 
+   
+  Source = SELECT t 
+      FROM Source:s -((Merchant_Receive_Transaction|Card_Send_Transaction):e1)- :t1 
+            -((Merchant_Receive_Transaction|Card_Send_Transaction):e2)- Payment_Transaction:t
+      WHERE t.@or_visted ==false
+      ACCUM t.@path_list = s.@path_list + [t1] + [t]
+      POST-ACCUM  t.@or_visted += true,
+                  @@is_fraud += t.is_fraud;
+     @@min_dist += 2;
+  ResultSet = ResultSet UNION Source;
+  END;
+  
+  
+  
+  tmp = SELECT s 
+        FROM Source:s
+  LIMIT print_number ;
+  Display = SELECT s
+            FROM tmp:s 
+            POST-ACCUM 
+              FOREACH v in s.@path_list DO 
+                @@display += v END;
+  Display = {@@display};
+  rlt = SELECT s 
+        FROM Display:s -((Merchant_Receive_Transaction|Card_Send_Transaction):e1)- Display:t
+        ACCUM @@fraud +=e1;
+  /*
+  rlt = SELECT s 
+      FROM start:s -((Merchant_Receive_Transaction|Card_Send_Transaction):e1)- :t1 
+            -((Merchant_Receive_Transaction|Card_Send_Transaction):e2)- tmp:f 
+      ACCUM          
+          @@fraud += e1,
+          @@fraud += e2  ;
+    */   
+   
+  PRINT @@fraud;
+  PRINT tmp[tmp.@path_list];
+}

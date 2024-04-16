@@ -46,7 +46,7 @@ To initiate the `wcc` and `pagerank` algorithms on the Merchant and Card network
 
 ### Step 2: Form Communities
 
-The provided solution kit includes two variations of the `wcc` community algorithm. The first employs the default community algorithm found in the built-in algorithm library, while the second leverages edge weight-based `wcc` to enhance community detection according to the dataset. Users have the flexibility to select either option for clustering purposes. For this solution kit, we use weighted `wcc` for community detection, so the following two queries need to be executed in step 2:
+The provided solution kit includes two variations of the `wcc` community algorithm. The first employs the default community algorithm found in the built-in algorithm library (i.e. `tg_wcc_card` and `tg_wcc_merchant`), while the second leverages edge weight-based `wcc` to enhance community detection according to the dataset. If user has own dataset, the first option is recommended. Users have the flexibility to select either option for clustering purposes. For this solution kit, we use `weighted wcc` for community detection, so the following two queries need to be executed in step 2:
 
 - `tg_wcc_card_weight_based`
 - `tg_wcc_merchant_weight_based`
@@ -110,4 +110,24 @@ These queries can be executed at any time and have no dependencies on the previo
 The `data` folder is populated with sample data files. These files are crafted to closely mimic real-world scenarios, providing a realistic context for testing and demonstration purposes.
 
 ## ML Model and Insights Application
-You can find the instructions for training the ML model and its performance metrics within the documentation located in the model folder. The Insights Applications are available as JSON files in the meta folder.
+
+- You can find the instructions for training the ML model and its performance metrics within the documentation located in the model folder.
+- The Insights Applications are available as JSON files in the meta folder.
+
+### Insights Applications
+
+There are two insights applications:
+- **ROI Dashboard**
+  - Shows the transaction fraud losses.
+  - Live total fraud losses and amount saved by TigerGraph.
+  - Live fraud distribution.
+  - ML performance.
+
+- **Transaction Fraud**
+  - The application has 5 pages:
+    - Merchant network pagerank.
+    - Shortest path to frauds with user-specified limit.
+    - Community.
+    - Card With Large Total Transaction Amount.
+    - Card with high transaction frequency.
+  - **Note:** For "Card With Large Total Transaction Amount" and "Card with high transaction frequency," the graph only shows fraudulent transactions to avoid overcrowded visualizations.
