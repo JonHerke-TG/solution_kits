@@ -1,0 +1,7 @@
+CREATE DISTRIBUTED QUERY set_party_fraud_status(VERTEX<Party> party, INT fraud_status) { 
+  
+  start = {party};
+  
+  start = select s from start:s post-accum s.is_fraud = fraud_status;
+  
+}

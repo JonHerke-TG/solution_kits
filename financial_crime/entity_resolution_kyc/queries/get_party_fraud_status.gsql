@@ -1,0 +1,11 @@
+CREATE DISTRIBUTED QUERY get_party_fraud_status(SET<VERTEX<Party>> parties) { 
+  
+  MapAccum<VERTEX<Party>, INT> @@fraud_status;
+  
+  start = {parties};
+  
+  start = select s from start:s post-accum @@fraud_status += (s -> s.is_fraud);
+  
+  print @@fraud_status as fraud_status;
+  
+}
