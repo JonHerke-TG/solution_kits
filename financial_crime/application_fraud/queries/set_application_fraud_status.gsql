@@ -1,4 +1,4 @@
-CREATE DISTRIBUTED QUERY set_application_fraud_status(VERTEX<Application> application, BOOL fraud_status) FOR GRAPH Application_Fraud { 
+CREATE DISTRIBUTED QUERY set_application_fraud_status(VERTEX<Application> application, BOOL fraud_status) { 
   
   start = {application};
   
