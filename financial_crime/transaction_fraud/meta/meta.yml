@@ -1,6 +1,7 @@
 metadata:
   name: Transaction Fraud
   graph: Transaction_Fraud
+  depends: financial_crime/library
   description: >
     Fraudsters are getting more sophisticated over time, creating a network of synthetic identities combining legitimate information like social security or national identification number, name, phone number, and physical address. Legacy fraud detection systems are largely based on the analysis of the behavior of an individual business entity, such as a customer, citizen, device, doctor, or healthcare provider, and find unusual patterns in that behavior.
   categories:
