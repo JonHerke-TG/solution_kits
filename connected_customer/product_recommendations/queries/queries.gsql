@@ -10,7 +10,8 @@ CREATE QUERY kmeans(
   FLOAT conv_threshold=0.1,
   INT random_seed=42,
   BOOL use_custom_timestamp=FALSE,
-  DATETIME custom_timestamp=to_datetime("1970-01-01")) {
+  DATETIME custom_timestamp=to_datetime("1970-01-01")) SYNTAX V1
+{
   TYPEDEF TUPLE<FLOAT distance, VERTEX centroid> Centroid_Distance;
   TYPEDEF TUPLE<FLOAT sse_delta, INT cluster_count, INT iter> Cluster_Count_Tuple;
   HeapAccum<Centroid_Distance> (1, distance ASC) @centroid_distance_heap;
@@ -206,8 +207,8 @@ CREATE QUERY combine_features(
   STRING target_v_type,
   SET<STRING> feature_v_type,
   INT hub_threshold,
-  INT split_threshold) {
-
+  INT split_threshold) SYNTAX V1
+{
   MapAccum<VERTEX, SumAccum<FLOAT>> @intersection_size_map;
   OrAccum @hub;
   DATETIME timestamp = now();
@@ -239,4 +240,339 @@ CREATE QUERY combine_features(
     ACCUM
       INSERT INTO Linked VALUES (s, to_string(getvid(s)) + "_" + to_string(getvid(t)) Combined_Feature, timestamp),
       INSERT INTO Linked VALUES (t, to_string(getvid(s)) + "_" + to_string(getvid(t)) Combined_Feature, timestamp);
+}
+
+
+CREATE DISTRIBUTED QUERY recommend_products(
+  INT batch_index,
+  INT num_batches,
+  INT target_batch=5,
+  FLOAT ignore_threshold = 0.001,
+  INT recommendation_count,
+  STRING data_types = "[[\"Customer\",\"Feature\",\"Edge\",[\"Interacted\"]], [\"Customer\",\"Feature\",\"Vertex\",[\"Product_Variant\"]], [\"Customer\",\"Target\",\"Edge\",[\"Interacted\"]], [\"Customer\",\"Target\",\"Vertex\",[\"Customer\"]], [\"Item\",\"Feature\",\"Edge\",[\"Interacted\"]], [\"Item\",\"Feature\",\"Vertex\",[\"Customer\"]], [\"Item\",\"Target\",\"Edge\",[\"Interacted\"]], [\"Item\",\"Target\",\"Vertex\",[\"Product_Variant\"]]]",
+  STRING edge_importance_factors = "[\"Customer\", \"Interacted\", 1], [\"Item\", \"Interacted\", 1]",
+  SET<STRING> edge_degree_scales,
+  FLOAT customer_popularity_scale = 1,
+  FLOAT item_popularity_scale = 1,
+  BOOL print_results = TRUE) SYNTAX V1
+{
+  TYPEDEF TUPLE<FLOAT score, VERTEX item> Item_Tuple;
+  HeapAccum<Item_Tuple> (recommendation_count, score DESC, item DESC) @recommended_items;
+  MapAccum<VERTEX, SumAccum<INT>> @sum_intersection_size, @@sum_set_size;
+  MapAccum<VERTEX, MapAccum<VERTEX, SumAccum<FLOAT>>> @item_intersect_map;
+  MapAccum<VERTEX, SumAccum<FLOAT>> @sum_similarity, @popularity, @item_popularity;
+  MaxAccum<FLOAT> @category_importance;
+  SetAccum<VERTEX> @ignore, @visited, @temp_set;
+  OrAccum @source_vert;
+
+  MapAccum<VERTEX, MaxAccum<FLOAT>> @max_similarity;
+  MapAccum<STRING, MaxAccum<FLOAT>> @@max_value;
+  MapAccum<STRING, MinAccum<FLOAT>> @@min_value;
+
+  GroupByAccum<STRING similarity_type, STRING overlap_type, STRING data_type, SetAccum<STRING> types> @@data_types;
+  GroupByAccum<STRING similarity_type, STRING edge_type, MaxAccum<FLOAT> scale_factor> @@importance_factors;
+  SetAccum<STRING> @@edge_degree_scales;
+
+  JSONARRAY arr = parse_json_array(data_types);
+  JSONARRAY inner_arr;
+  JSONARRAY entry;
+  FOREACH i IN RANGE[0, arr.size()-1] DO
+    entry = arr.getJSONArray(i);
+    // Customer/Item, Feature/Target, Edge/Vertex -> Type
+    inner_arr = entry.getJSONArray(3);
+    FOREACH j IN RANGE[0, inner_arr.size()-1] DO
+      @@data_types += (entry.getString(0), entry.getString(1), entry.getString(2) -> inner_arr.getString(j));
+      IF @@edge_degree_scales.size() == 0 AND entry.getString(2) == "Edge" THEN
+        @@edge_degree_scales += entry.getString(3);
+      END;
+    END;
+  END;
+
+  arr = parse_json_array(edge_importance_factors);
+  FOREACH i IN RANGE[0, arr.size()-1] DO
+    // Customer/Item/Category, Type/Id -> Factor
+    entry = arr.getJSONArray(i);
+    @@importance_factors += (entry.getString(0), entry.getString(1) -> entry.getDouble(2));
+  END;
+
+  all_customers (ANY) = {Customer.*};
+
+  src_customers =
+    SELECT s FROM all_customers:s
+    WHERE getvid(s) % num_batches == batch_index
+    POST-ACCUM
+      s.@source_vert += TRUE;
+
+
+  // customer similarity based on purchase history and cluster
+  previous_items =
+    SELECT t
+    FROM src_customers:s-(Interacted:e)-Product_Variant:t
+    WHERE e.interaction_type == "Purchased"
+    ACCUM t.@temp_set += s;
+
+  previous_items =
+    SELECT t FROM previous_items:s -(Belongs_To)- Product:t
+    ACCUM
+      t.@temp_set += s.@temp_set
+    POST-ACCUM
+      s.@temp_set.clear();
+
+  previous_items =
+    SELECT t FROM previous_items:s -(reverse_Belongs_To)- Product_Variant:t
+    ACCUM
+      t.@ignore += s.@temp_set
+    POST-ACCUM
+      s.@temp_set.clear();
+
+  // get all verts for which we need to calculate set size
+  SetAccum<STRING> @@e_types, @@v_types;
+  @@e_types = @@data_types.get("Customer", "Feature", "Edge").types;
+  @@v_types = @@data_types.get("Customer", "Feature", "Vertex").types;
+  features =
+    SELECT t FROM src_customers:s -(@@e_types)- @@v_types:t;
+
+  @@e_types = @@data_types.get("Customer", "Target", "Edge").types;
+  @@v_types = @@data_types.get("Customer", "Target", "Vertex").types;
+  other_customers =
+    SELECT t FROM features:s -(@@e_types)- @@v_types:t;
+
+  included_customers = other_customers UNION src_customers;
+
+  // scale importance of features by degree
+  // ideally this is a cached property
+  // calculate set sizes for everyone
+  @@e_types = @@data_types.get("Customer", "Feature", "Edge").types;
+  @@v_types = @@data_types.get("Customer", "Feature", "Vertex").types;
+  inluded_customers =
+    SELECT s FROM included_customers:s -(@@e_types:e)- @@v_types:t
+    WHERE @@edge_degree_scales.contains(e.type)
+    ACCUM
+      @@max_value += (t.type -> t.outdegree(@@data_types.get("Customer", "Target", "Edge").types)),
+      @@min_value += (t.type -> t.outdegree(@@data_types.get("Customer", "Target", "Edge").types));
+
+  @@e_types = @@data_types.get("Customer", "Feature", "Edge").types;
+  @@v_types = @@data_types.get("Customer", "Feature", "Vertex").types;
+  features =
+    SELECT t FROM included_customers:s -(@@e_types:e)- @@v_types:t
+    ACCUM
+      FLOAT sim_score = 1,
+      INT deg = t.outdegree(@@data_types.get("Customer", "Target", "Edge").types),
+      IF e.type == "Interacted" THEN
+        sim_score = e.score
+      END,
+      IF @@importance_factors.containsKey("Customer", e.type) THEN
+        sim_score = sim_score * @@importance_factors.get("Customer", e.type).scale_factor
+      END,
+      IF @@edge_degree_scales.contains(e.type) THEN
+        sim_score = sim_score * max([1-((deg - @@min_value.get(t.type)) / (@@max_value.get(t.type) - @@min_value.get(t.type))), 0.1])
+      END,
+      @@sum_set_size += (s -> sim_score),
+      IF s.@source_vert == TRUE THEN
+        t.@sum_similarity += (s -> sim_score)
+        END;
+
+  @@e_types = @@data_types.get("Customer", "Target", "Edge").types;
+  @@v_types = @@data_types.get("Customer", "Target", "Vertex").types;
+  other_customers =
+    SELECT t
+    FROM features:s -(@@e_types:e)- @@v_types:t
+    ACCUM
+      t.@sum_intersection_size += s.@sum_similarity
+    POST-ACCUM (t)
+      FOREACH (tgt, score) IN t.@sum_intersection_size DO
+        FLOAT div = (@@sum_set_size.get(t) + @@sum_set_size.get(tgt) - score),
+        IF div <= 0 THEN
+          div = 1.0
+        END,
+        t.@sum_similarity += (tgt -> score*1.0/div)
+      END,
+      t.@sum_intersection_size.clear()
+    POST-ACCUM (s)
+      s.@sum_similarity.clear(),
+      s.@sum_intersection_size.clear();
+
+  item_links = features UNION other_customers;
+
+  // calculate which items are most popular/compatible
+  items =
+    SELECT t FROM item_links:s -(Has_Attribute|Interacted)- Product_Variant:t
+    ACCUM
+      FOREACH (src, score) IN s.@sum_similarity DO
+        IF s.@ignore.contains(src) == FALSE THEN
+          t.@popularity += (src -> score)
+        END
+      END
+    POST-ACCUM (t)
+      FOREACH (src, score) IN t.@popularity DO
+        //t.@visited += src,
+        IF score <= ignore_threshold THEN
+          t.@ignore += src
+        END
+      END;
+
+  @@sum_set_size.clear();
+  item_links =
+    SELECT s FROM item_links:s
+    POST-ACCUM
+      s.@sum_intersection_size.clear(),
+      s.@sum_similarity.clear();
+
+  // traverse from kept items to categories and update parent map
+  // traverse via item attributes to other items
+  // consider including customer purchases and box history
+  // update popularity of item
+
+  // traverse to previously interacted items
+  interacted_items =
+    SELECT t FROM src_customers:s -(Interacted:e)- Product_Variant:t
+    ACCUM t.@max_similarity += (s -> e.score);
+
+  // get parents of interacted item variants
+  parent_items =
+    SELECT t FROM interacted_items:s -(Belongs_To)- Product:t
+    ACCUM
+      t.@max_similarity += s.@max_similarity;
+
+  interacted_items =
+    SELECT t FROM parent_items:s -(reverse_Belongs_To)- Product_Variant:t
+    ACCUM
+      t.@max_similarity += s.@max_similarity
+    POST-ACCUM
+      t.@source_vert += TRUE;
+
+  ////////////////
+  // calculate range of values of neighborhood set sizes
+  @@max_value.clear();
+  @@min_value.clear();
+
+  @@e_types = @@data_types.get("Item", "Feature", "Edge").types;
+  @@v_types = @@data_types.get("Item", "Feature", "Vertex").types;
+  customers (ANY) =
+    SELECT t FROM interacted_items:s -(@@e_types)- @@v_types:t;
+
+  @@e_types = @@data_types.get("Item", "Target", "Edge").types;
+  @@v_types = @@data_types.get("Item", "Target", "Vertex").types;
+  other_items =
+    SELECT t FROM customers:s -(@@e_types)- @@v_types:t;
+
+  included_items = other_items UNION interacted_items;
+
+  @@e_types = @@data_types.get("Item", "Feature", "Edge").types;
+  @@v_types = @@data_types.get("Item", "Feature", "Vertex").types;
+  inluded_items =
+    SELECT s FROM included_items:s -(@@e_types:e)- @@v_types:t
+    WHERE @@edge_degree_scales.contains(e.type)
+    ACCUM
+      @@max_value += (t.type -> t.outdegree(@@data_types.get("Item", "Target", "Edge").types)),
+      @@min_value += (t.type -> t.outdegree(@@data_types.get("Item", "Target", "Edge").types));
+
+  // calculate overlap on customers
+  FOREACH i IN RANGE[0, target_batch-1] DO
+    @@e_types = @@data_types.get("Item", "Feature", "Edge").types;
+    @@v_types = @@data_types.get("Item", "Feature", "Vertex").types;
+    customers =
+      SELECT t FROM included_items:s -(@@e_types:e)- @@v_types:t
+      WHERE getvid(t) % target_batch == i
+      ACCUM
+        FLOAT sim_score = 1,
+        INT deg = t.outdegree(@@data_types.get("Item", "Target", "Edge").types),
+        IF e.type == "Interacted" THEN
+          sim_score = e.score
+        END,
+        IF @@importance_factors.containsKey("Item", e.type) THEN
+          sim_score = sim_score * @@importance_factors.get("Item", e.type).scale_factor
+        END,
+        IF @@edge_degree_scales.contains(e.type) THEN
+          sim_score = sim_score * max([1-((deg - @@min_value.get(t.type)) / (@@max_value.get(t.type) - @@min_value.get(t.type))), 0.1])
+        END,
+        // calculate set size of source item
+        @@sum_set_size += (s -> sim_score),
+        // scale overlap by contribution from source customer
+        FOREACH (src_customer, score) IN s.@max_similarity DO
+          IF src_customer == t THEN
+            CONTINUE
+          END,
+          IF s.@source_vert == TRUE THEN
+            t.@item_intersect_map += (src_customer -> (s -> sim_score * score))
+          END
+        END;
+    // traverse to other items...
+    @@e_types = @@data_types.get("Item", "Target", "Edge").types;
+    @@v_types = @@data_types.get("Item", "Target", "Vertex").types;
+    similar_items =
+      SELECT t
+      FROM customers:s -(@@e_types:e)- @@v_types:t
+      ACCUM
+        t.@item_intersect_map += s.@item_intersect_map
+      POST-ACCUM (t)
+        FOREACH (src_customer, score_map) IN t.@item_intersect_map DO
+          IF t.@ignore.contains(src_customer) THEN
+            CONTINUE
+          END,
+          FOREACH (src_item, score) IN score_map DO
+            FLOAT div = (@@sum_set_size.get(t) + @@sum_set_size.get(src_item) - score),
+            IF div <= 0 THEN
+              div = 1
+            END,
+            t.@item_popularity += (src_customer -> score*1.0/div)
+          END
+        END,
+        t.@item_intersect_map.clear()
+      POST-ACCUM (s)
+        s.@item_intersect_map.clear();
+  END;
+
+  /////////////////
+  items = items UNION similar_items;
+
+  // apply category importance scale
+  item_categories (Product_Category) = {Product_Category.*};
+  categories (ANY) =
+    SELECT s FROM item_categories:s WHERE @@importance_factors.containsKey("Category", s.id)
+    POST-ACCUM s.@category_importance = @@importance_factors.get("Category", s.id).scale_factor;
+
+  WHILE categories.size() > 0 DO
+    categories =
+      SELECT t FROM categories:s -(reverse_Belongs_To)- (Product_Category|Product|Product_Variant):t
+      WHERE
+        (t.type != "Product_Variant" OR t.@visited.size() > 0)
+      ACCUM
+        t.@category_importance += s.@category_importance;
+  END;
+
+  // INTERLEAVE RECOMMENDATIONS
+  GroupByAccum<STRING popularity_type, VERTEX src_customer, MaxAccum<FLOAT> max_value> @@popularity_max_value;
+  // final filter + normalization
+  items =
+    SELECT s FROM items:s
+    POST-ACCUM
+      FLOAT popularity = 0,
+      FOREACH (src_customer, score) IN s.@popularity DO
+        popularity = score * s.@category_importance * customer_popularity_scale,
+        @@popularity_max_value += ("popularity", src_customer -> popularity)
+      END,
+      FOREACH (src_customer, score) IN s.@item_popularity DO
+        popularity = score * s.@category_importance * item_popularity_scale,
+        @@popularity_max_value += ("item_popularity", src_customer -> popularity)
+      END;
+
+  items =
+    SELECT s FROM items:s
+    ACCUM
+      FLOAT popularity = 0,
+      FOREACH (src_customer, score) IN s.@popularity DO
+        IF @@popularity_max_value.get("popularity", src_customer).max_value > 0 THEN
+          popularity = score * s.@category_importance * customer_popularity_scale,
+          src_customer.@recommended_items += Item_Tuple(popularity / @@popularity_max_value.get("popularity", src_customer).max_value, s)
+        END
+      END,
+      FOREACH (src_customer, score) IN s.@item_popularity DO
+        popularity = score * s.@category_importance * item_popularity_scale,
+        src_customer.@recommended_items += Item_Tuple(popularity / @@popularity_max_value.get("item_popularity", src_customer).max_value, s)
+      END;
+
+  IF print_results THEN
+    PRINT src_customers[src_customers.@recommended_items];
+  END;
 }
