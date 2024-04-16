@@ -1,0 +1,11 @@
+CREATE DISTRIBUTED QUERY get_application_fraud_status(SET<VERTEX<Application>> applications) FOR GRAPH Application_Fraud { 
+  
+  MapAccum<VERTEX<Application>, BOOL> @@fraud_status;
+  
+  start = {applications};
+  
+  start = select s from start:s post-accum @@fraud_status += (s -> s.is_fraud);
+  
+  print @@fraud_status as fraud_status;
+  
+}
