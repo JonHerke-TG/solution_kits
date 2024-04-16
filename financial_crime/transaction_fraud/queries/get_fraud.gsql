@@ -1,7 +1,0 @@
-USE GRAPH Transaction_Fraud
-CREATE DISTRIBUTED OPENCYPHER QUERY get_fraud(/* Parameters here */) FOR GRAPH Transaction_Fraud { 
-  MATCH (t:Payment_Transaction)
-  WHERE t.is_fraud=1
-  RETURN t 
-  LIMIT 10
-}
