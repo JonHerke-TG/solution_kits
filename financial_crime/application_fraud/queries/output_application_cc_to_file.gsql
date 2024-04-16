@@ -1,0 +1,16 @@
+CREATE OR REPLACE QUERY output_application_cc_to_file(STRING output_file_path = "/home/tigergraph/gsql_output/application_cc_output.txt") { 
+  
+  FILE f (output_file_path);
+  
+  f.println("Application", "Connected_Component");
+  
+  entities = {Application.*};
+  
+  components = SELECT t
+      FROM entities:s-(Application_In_Ring:e)-Connected_Component:t
+      ACCUM f.println(s.id, t.id)
+  ;
+  
+  PRINT "Results file created!" AS result;
+  
+}
