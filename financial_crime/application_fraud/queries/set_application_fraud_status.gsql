@@ -1,0 +1,7 @@
+CREATE DISTRIBUTED QUERY set_application_fraud_status(VERTEX<Application> application, BOOL fraud_status) FOR GRAPH Application_Fraud { 
+  
+  start = {application};
+  
+  start = select s from start:s post-accum s.is_fraud = fraud_status;
+  
+}
