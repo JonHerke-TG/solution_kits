@@ -19,7 +19,7 @@ This repository includes multiple components:
 
 The `setup.sh` script is designed to streamline the initial setup process by sequentially executing the following steps:
 
-1. **Schema Creation**: Initiates the schema creation process using the `1_create_schema.gsql` script. This schema is a subset of the Super Schema in financial_crime/library.
+1. **Schema Creation**: This schema is a subset of the Super Schema in financial_crime/library/schema. To create the schema, first run `gsql /home/tigergraph/solution_kits/financial_crime/library/schema/general_global_financial_crime_super_schema.gsql` to generate global vertex and edge types. Then, user can run `/home/tigergraph/solution_kits/financial_crime/transaction_fraud/schema/create_schema_bottomup.gsql` to create the graph. 
 2. **Data Loading**: Load data into the schema by running the data loading job with the `2_load_data.gsql` script. 
 3. **Query Installation**: Completes the setup by installing necessary queries through the `3_install_queries.sh` script.
 
