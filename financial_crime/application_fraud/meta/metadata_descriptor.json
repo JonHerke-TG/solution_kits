@@ -1,1 +1,123 @@
-
+{
+    "queries": [
+        {
+            "function_header": "delete_all_application_cc_connections",
+            "description": "This query deletes all the Entity_In_Ring edges and is used as the first step in the Entity Resolution process.",
+            "docstring": "This query removes all the Entity_In_Ring edges in the system. This query is used as the first step in the Entity Resolution process. Run the query with `runInstalledQuery('delete_all_application_cc_connections', params={'num_of_batches': 'INSERT_NUM_OF_BATCHES_HERE', 'batch_id': 'INSERT_BATCH_ID_HERE' })` num_of_batches defaults to 1. batch_id defaults to 0",
+            "param_types": {
+                "num_of_batches": "int",
+                "batch_id": "int"
+            }
+        },
+        {
+            "function_header": "match_application_entities",
+            "description": "This query finds matches and creates similarity edges between entities that match. It is used as the second step in the Entity Resolution process, right after running delete_all_application_cc_connections.",
+            "docstring": "This query finds matches between entities. This query inserts same_as edges between entities that match. This query is used as the 2nd step in the Entity Resolution process. Run the query with `runInstalledQuery('match_application_entities', params={ 'Application_Full_Name_weight': 'INSERT_WEIGHT_VALUE_HERE', 'Application_DOB_weight': 'INSERT_WEIGHT_VALUE_HERE', 'Application_Email_weight': 'INSERT_WEIGHT_VALUE_HERE', 'Application_Phone_weight': 'INSERT_WEIGHT_VALUE_HERE', 'Application_Address_weight': 'INSERT_WEIGHT_VALUE_HERE', 'Application_IP_weight': 'INSERT_WEIGHT_VALUE_HERE', 'Application_ID_weight': 'INSERT_WEIGHT_VALUE_HERE', 'Application_Device_weight': 'INSERT_WEIGHT_VALUE_HERE', 'Application_Party_weight': 'INSERT_WEIGHT_VALUE_HERE', 'Application_Account_weight': 'INSERT_WEIGHT_VALUE_HERE', 'Application_Card_weight': 'INSERT_WEIGHT_VALUE_HERE', 'num_of_source_batches': 'INSERT_NUM_OF_SOURCE_BATCHES_HERE', 'num_of_target_batches': 'INSERT_NUM_OF_TARGET_BATCHES_HERE', 'threshold': 'INSERT_THRESHOLD_HERE', 'pii_low_connections_limit': 'INSERT_LOW_CONNECTIONS_LIMIT_HERE', 'pii_high_connections_limit': 'INSERT_HIGH_CONNECTIONS_LIMIT_HERE', 'compute_entities_after_date': 'INSERT_TIMESTAMP_HERE' })` Application_Full_Name_weight defaults to 0.2. Application_DOB_weight defaults to 0.2. Application_Email_weight defaults to 0.2. Application_Phone_weight defaults to 0.2. Application_Address_weight defaults to 0.2. Application_IP_weight defaults to 0.2. Application_ID_weight defaults to 1.0. Application_Device_weight defaults to 1.0. Application_Party_weight defaults to 1.0. Application_Account_weight defaults to 1.0. Application_Card_weight defaults to 1.0. num_of_source_batches defaults to 10. num_of_target_batches defaults to 1. threshold defaults to 1. pii_low_connections_limit defaults to 100. pii_high_connections_limit defaults to 25000. compute_entities_after_date defaults to 1970-01-01 00:00:00",
+            "param_types": {
+                "Application_Full_Name_weight": "float",
+                "Application_DOB_weight": "float",
+                "Application_Email_weight": "float",
+                "Application_Phone_weight": "float",
+                "Application_Address_weight": "float",
+                "Application_IP_weight": "float",
+                "Application_ID_weight": "float",
+                "Application_Device_weight": "float",
+                "Application_Party_weight": "float",
+                "Application_Account_weight": "float",
+                "Application_Card_weight": "float",
+                "num_of_source_batches": "int",
+                "num_of_target_batches": "int",
+                "threshold": "float",
+                "pii_low_connections_limit": "int",
+                "pii_high_connections_limit": "int",
+                "compute_entities_after_date": "datetime"
+            }
+        },
+        {
+            "function_header": "unify_application_entities",
+            "description": "This query groups together the matches entities, by connecting them to the same Connected_Compoennt veretx.",
+            "docstring": "This query groups together the matches entities, by connecting them to the same Connected_Compoennt node. This query creates Entity_In_Ring edges. Run the query with `runInstalledQuery('unify_application_entities')` this query does not have any params",
+            "param_types": {}
+        },
+        {
+            "function_header": "delete_unused_cc_nodes",
+            "description": "This query deletes all the unused Connected_Component vertices and it is used as an optional extra step after running the Entity Resolution process.",
+            "docstring": "This query removes all the unused Connected_Component nodes in the system. This query is used as an optional extra step after running the Entity Resolution process. Run the query with `runInstalledQuery('delete_unused_cc_nodes', params={'num_of_batches': 'INSERT_NUM_OF_BATCHES_HERE', 'batch_id': 'INSERT_BATCH_ID_HERE' })` num_of_batches defaults to 1. batch_id defaults to 0",
+            "param_types": {
+                "num_of_batches": "int",
+                "batch_id": "int"
+            }
+        },
+        {
+            "function_header": "incremental_application_match",
+            "description": "This query parses a JSON payload containing Application and associated PII data, upserts the data into the graph, and returns whether the provided Application is able to be matched with any existing Applications using approximate weighted weakly connected components algorithm matching",
+            "docstring": "This query parses input string including a JSON payload containing Application and associated PII data such as Full Name, DOB, Email, Phone, Address, IP, ID, Device, Party, Account, and Card.  It is used for incrementally adding Application and PII data to the graph and associating to existing Application Connected_Component vertex in near real time when matching succeeds.  If any Applications share any of the PII attributes they will accumulate the respective weight per instance and any accumulated weights over threshold are considered a positive match.  The matching status is returned in the entity_resolution response attribute along with the respective Application. Run the query with `runInstalledQuery('incremental_application_match', params={'input': 'INSERT_INPUT_HERE', 'Application_Full_Name_weight': 'INSERT_APPLICATION_FULL_NAME_WEIGHT_HERE', 'Application_DOB_weight' : 'INSERT_APPLICATION_DOB_WEIGHT_HERE', 'Application_Email_weight' : 'INSERT_APPLICATION_EMAIL_WEIGHT_HERE', 'Application_Phone_weight' : 'INSERT_APPLICATION_PHONE_WEIGHT_HERE', 'Application_Address_weight' : 'INSERT_APPLICATION_ADDRESS_WEIGHT_HERE', 'Application_IP_weight' : 'INSERT_APPLICATION_IP_WEIGHT_HERE', 'Application_ID_weight' : 'INSERT_APPLICATION_ID_WEIGHT_HERE', 'Application_Device_weight' : 'INSERT_APPLICATION_DEVICE_WEIGHT_HERE', 'Application_Party_weight' : 'INSERT_APPLICATION_PARTY_WEIGHT_HERE', 'Application_Account_weight' : 'INSERT_APPLICATION_ACCOUNT_WEIGHT_HERE', 'Application_Card_weight' : 'INSERT_APPLICATION_CARD_WEIGHT_HERE', 'threshold' : 'INSERT_THRESHOLD_HERE' })` Application_Full_Name_weight defaults to 0.2. Application_DOB_weight defaults to 0.2. Application_Email_weight defaults to 0.2. Application_Phone_weight defaults to 0.2. Application_Address_weight defaults to 0.2. Application_IP_weight defaults to 0.2. Application_ID_weight defaults to 1.0. Application_Device_weight defaults to 1.0. Application_Party_weight defaults to 1.0. Application_Account_weight defaults to 1.0. Application_Card_weight defaults to 1.0. threshold defaults to 1.0. input is a JSON string with structure {"application": "string", "created_at": "string datetime", "status": "string", "line_of_credit": "string float", "annual_percentage_rate": "string float", "fraud": "boolean", "product": "string", "name": "string", "dob": "string datetime", "email": "string", "phone_numbers": [{"type": "string", "id": "string"}], "addresses": [{"type": "string", "line_1": "string", "line_2": "string", "city": "string", "state": "string", "zipcode": "string", "county": "string", "country": "string"}], "ip_address": "string", "ids": [{"type": "string", "id": "string"}], "device_id": "string", "party": "string", "accounts": [{"type": "string", "id": "string"}], "cards": [{"type": "string", "id": "int"}]}",
+            "param_types": {
+                "input" : "string",
+                "Application_Full_Name_weight" : "float",
+                "Application_DOB_weight" : "float",
+                "Application_Email_weight" : "float",
+                "Application_Phone_weight" : "float",
+                "Application_Address_weight" : "float",
+                "Application_IP_weight" : "float",
+                "Application_ID_weight" : "float",
+                "Application_Device_weight" : "float",
+                "Application_Party_weight" : "float",
+                "Application_Account_weight" : "float",
+                "Application_Card_weight" : "float",
+                "threshold" : "float"
+            }
+          },
+          {
+            "function_header": "incremental_application_unify",
+            "description": "This query associates Applications unable to be matched to any existing Application using incremental_application_match into its own respective Connected_Component community vertex so it can be eligible for weighted weakly connected components matching in near real time",
+            "docstring": "This query associates Applications to their own Connected_Component community vertex. It is used in the near real time matching flow when any new Application sent to incremental_application_match returns entity_resolution false. Run the query with `runInstalledQuery('incremental_application_unify', params={'applications': 'INSERT_APPLICATIONS_HERE' })`",
+            "param_types": {
+                "applications" : "Set of Application vertices"
+            }
+          },
+          {
+            "function_header": "get_application_cc_features",
+            "description": "This query returns graph features for the communities created using the weighted weakly connected components matching logic for any given application Application in near real time",
+            "docstring": "This query returns graph features for a given Application's associated Connected_Component community vertex for any PII data with a maximum outdegree of connections including distinct Application node count, fraud Application node count, Name node count, Name connections count, Name only connections count, DOB node count, DOB connections count, DOB only connections count, Email node count, Email connections count, Email only connections count, Phone node count, Phone connections count, Phone only connections count, Address node count, Address connections count, Address only connections count, IP node count, IP connections count, IP only connections count, ID node count, ID connections count, ID only connections count, Device node count, Device connections count, Device only connections count, Party node count, Party connections count, Party only connections count, Account node count, Account connections count, Account only connections count, Card node count, Card connections count, Card only connections count. It is used in the near real time matching flow to augment a decision model with graph features when any new Application sent to incremental_application_match returns entity_resolution true. Run the query with `runInstalledQuery('get_application_cc_features', params={'application': 'INSERT_APPLICATION_HERE', 'connections': 'INSERT_CONNECTIONS_HERE'})` connections defaults to 25000. ",
+            "param_types": {
+                "application" : "Application vertex",
+                "connections" : "int"
+            }
+          },
+          {
+            "function_header": "distance_and_path_to_fraud_application",
+            "description": "This query returns the distance and path of connection to any fraud Applications up to depth hops deep for any given input Application in near real time",
+            "docstring": "This query returns degree and path of connection graph features for a given Application to any fraud Applications up to depth hops deep. It is used in the near real time matching flow to augment a decision model with graph features when any new Application sent to incremental_application_match returns entity_resolution true. Run the query with `runInstalledQuery('distance_and_path_to_fraud_application', params={'input': 'INSERT_INPUT_HERE', 'depth': 'INSERT_DEPTH_HERE'})` depth defaults to 5. ",
+            "param_types": {
+                "input" : "Application vertex",
+                "depth" : "int"
+            }
+          },
+          {
+            "function_header": "get_application_fraud_status",
+            "description": "This query returns the boolean is_fraud attribute for any given Application(s) in near real time",
+            "docstring": "This query returns the boolean is_fraud attribute for any given Application vertice(s) in near real time. Run the query with `runInstalledQuery('get_application_fraud_status', params={'applications': 'INSERT_APLICATIONS_HERE'})`",
+            "param_types": {
+                "applications" : "Set of Application vertices"
+            }
+          },
+          {
+            "function_header": "set_application_fraud_status",
+            "description": "This query sets the boolean is_fraud attribute for any given Application to the provided is_fraud boolean value in near real time",
+            "docstring": "This query sets the boolean is_fraud attribute for any given Application vertex to the provided is_fraud boolean value in near real time. Run the query with `runInstalledQuery('set_application_fraud_status', params={'application': 'INSERT_APPLICATIONS_HERE', 'fraud_status': 'INSERT_FRAUD_STATUS_HERE'})`",
+            "param_types": {
+                "application" : "Application vertex",
+                "fraud_status": "bool"
+            }
+          },
+          {
+            "function_header": "output_application_cc_to_file",
+            "description": "This query outputs a file containing a mapping of all Application vertices to their respective Connected_Component community vertex",
+            "docstring": "This query outputs a file at the provided string output_file_path location mapping all Application vertices to their respective Connected_Component community vertex. Run the query with `runInstalledQuery('output_application_cc_to_file', params={'output_file_path': 'INSERT_OUTPUT_FILE_PATH_HERE'})` output_file_path defaults to '/home/tigergraph/gsql_output/application_cc_output.txt'. ",
+            "param_types": {
+                "output_file_path" : "string"
+            }
+          }
+    ]
+}
