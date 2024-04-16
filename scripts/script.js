@@ -8,13 +8,17 @@ import mime from "mime";
 import zlib from "zlib";
 import { renderMarkdown } from "./markdown.js";
 
-const bucketName = "tigergraph-solution-kits";
+const defaultBucketName = "tigergraph-solution-kits";
 const disableCacheControl = "max-age=0,no-cache,no-store";
 const imageCacheControl = "max-age=86400"; // cache image for  1 day
 
+function getBucketName() {
+  return process.env.BUCKET_NAME || defaultBucketName();
+}
+
 const s3 = new AWS.S3();
 const commonBucketConfig = {
-  Bucket: bucketName,
+  Bucket: getBucketName(),
 };
 
 async function syncFile(file, cacheControl = disableCacheControl) {
@@ -30,7 +34,7 @@ async function syncFile(file, cacheControl = disableCacheControl) {
   try {
     const object = await s3
       .headObject({
-        Bucket: bucketName,
+        Bucket: getBucketName(),
         Key: file,
       })
       .promise();
@@ -58,7 +62,7 @@ async function syncFile(file, cacheControl = disableCacheControl) {
     }
   }
 
-  return `https://${bucketName}.s3.us-west-1.amazonaws.com/${file}`;
+  return `https://${getBucketName()}.s3.us-west-1.amazonaws.com/${file}`;
 }
 
 async function syncFolder(folder, cacheControl = disableCacheControl) {
@@ -68,15 +72,6 @@ async function syncFolder(folder, cacheControl = disableCacheControl) {
     if (fs.lstatSync(file).isDirectory()) {
       continue;
     }
-    results.push(await syncFile(file, cacheControl));
-  }
-  return results;
-}
-
-async function syncPattern(pattern, cacheControl = disableCacheControl) {
-  const files = globSync(pattern);
-  let results = [];
-  for (let file of files) {
     results.push(await syncFile(file, cacheControl));
   }
   return results;
@@ -159,6 +154,23 @@ function concatFiles(files) {
   return content;
 }
 
+// we need to concat loading job files separately
+// replace bucket name in loading job files
+function concatLoadingFiles(files) {
+  const fileContents = files
+    .map((file) => fs.readFileSync(file, "utf8"))
+    .map((content) => content.replaceAll("tigergraph-solution-kits", getBucketName()));
+
+  let content = "";
+  for (let i = 0; i < files.length; i++) {
+    content += "#File: " + files[i] + "\n";
+    content += fileContents[i];
+    content += "\n\n";
+  }
+
+  return content;
+}
+
 async function getSolutionDetail(dir, first, last) {
   const schemaFiles = globSync(`${dir}/schema/*.gsql`);
   const schema = concatFiles(schemaFiles);
@@ -196,7 +208,7 @@ async function getSolutionDetail(dir, first, last) {
   const query = concatFiles(allQueryFiles);
 
   const sampleLoadingJobFiles = globSync(`${dir}/loading_job/*.gsql`);
-  const sampleLoadingJob = concatFiles(sampleLoadingJobFiles);
+  const sampleLoadingJob = concatLoadingFiles(sampleLoadingJobFiles);
 
   const resetFiles = globSync(`${dir}/reset/*.gsql`);
   const reset = concatFiles(resetFiles);

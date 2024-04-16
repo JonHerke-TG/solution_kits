@@ -32,7 +32,7 @@ solution name/
 
 3. The `data` folder will contain the sample data. For example, if the data is at `financial_crime/transaction_fraud/transaction_fraud/data`, we will upload this folder to `s3://tigergraph-solution-kits/financial_crime/transaction_fraud/transaction_fraud/data` when merging into the master branch.
 
-4. The `loading_job` folder contains the loading job for loading sample data.
+4. The `loading_job` folder contains the loading job for loading sample data, we will have separate bucket to host sample data for development and production environment. When writing loading job, we **must** use `tigergraph-solution-kits`, the github action will automatically replace it with `tigergraph-solution-kits-prod` when merged into main branch
 
 5. `udfs` contains the UDFs for the solution.
 
@@ -76,6 +76,9 @@ queries:
 
 ## S3 bucket layout
 
+1. `tigergraph-solution-kits` bucket for develop environment
+2. `tigergraph-solution-kits-prod` bucket for production environment
+
 ```
 tigergraph-solution-kits
   list.json
@@ -87,3 +90,9 @@ tigergraph-solution-kits
       icon.png
       application.json
 ```
+
+## Github action
+
+1. `main` branch is for production environment, when code merge into `main` branch, it will generate metadata an push it to `tigergraph-solution-kits-pro` bucket
+
+1. non `main` branch is for development environment, any push to the development branch, it will generate metadata and push it to `tigergraph-solution-kits` bucket
