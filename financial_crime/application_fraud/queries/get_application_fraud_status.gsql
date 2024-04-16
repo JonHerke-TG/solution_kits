@@ -1,4 +1,4 @@
-CREATE DISTRIBUTED QUERY get_application_fraud_status(SET<VERTEX<Application>> applications) FOR GRAPH Application_Fraud { 
+CREATE DISTRIBUTED QUERY get_application_fraud_status(SET<VERTEX<Application>> applications) { 
   
   MapAccum<VERTEX<Application>, BOOL> @@fraud_status;
   
