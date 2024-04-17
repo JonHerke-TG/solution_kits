@@ -1,4 +1,4 @@
-CREATE OR REPLACE DISTRIBUTED QUERY incremental_application_unify(SET<VERTEX<Application>> applications) { 
+CREATE OR REPLACE QUERY incremental_application_unify(SET<VERTEX<Application>> applications) { 
 
   MinAccum<INT> @cc_id; // Each vertex's tentative component id
 
