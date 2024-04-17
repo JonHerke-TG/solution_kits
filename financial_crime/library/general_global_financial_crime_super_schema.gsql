@@ -25,6 +25,8 @@
   CREATE VERTEX Party(PRIMARY_ID id STRING, is_fraud INT, gender STRING, dob DATETIME, party_type STRING, name STRING, created_at DATETIME) WITH STATS="OUTDEGREE_BY_EDGETYPE", PRIMARY_ID_AS_ATTRIBUTE="true"
   CREATE VERTEX Connected_Component(PRIMARY_ID id INT) WITH STATS="OUTDEGREE_BY_EDGETYPE", PRIMARY_ID_AS_ATTRIBUTE="true"
   CREATE VERTEX DOB(PRIMARY_ID dob DATETIME) WITH STATS="OUTDEGREE_BY_EDGETYPE", PRIMARY_ID_AS_ATTRIBUTE="true"
+  CREATE VERTEX Application(PRIMARY_ID id STRING, created_at DATETIME, status STRING, line_of_credit FLOAT, annual_percentage_rate FLOAT, is_fraud BOOL) WITH STATS="OUTDEGREE_BY_EDGETYPE", PRIMARY_ID_AS_ATTRIBUTE="true"
+  CREATE VERTEX Product(PRIMARY_ID id STRING, name STRING, description STRING, type_of STRING) WITH STATS="OUTDEGREE_BY_EDGETYPE", PRIMARY_ID_AS_ATTRIBUTE="true"
 
   CREATE UNDIRECTED EDGE Merchant_Merchant(FROM Merchant, TO Merchant, weight FLOAT)
   CREATE UNDIRECTED EDGE Merchant_Receive_Transaction(FROM Payment_Transaction, TO Merchant)
@@ -63,5 +65,22 @@
   CREATE UNDIRECTED EDGE Entity_In_Ring(FROM Party, TO Connected_Component)
   CREATE UNDIRECTED EDGE Has_DOB(FROM Party, TO DOB)
   CREATE UNDIRECTED EDGE Has_Full_Name(FROM Party, TO Full_Name)
+
+  CREATE UNDIRECTED EDGE Application_Has_Full_Name(FROM Application, TO Full_Name)
+  CREATE UNDIRECTED EDGE Application_Has_Phone(FROM Application, TO Phone)
+  CREATE UNDIRECTED EDGE Application_Has_Email(FROM Application, TO Email)
+  CREATE UNDIRECTED EDGE Application_Has_DOB(FROM Application, TO DOB)
+  CREATE UNDIRECTED EDGE Application_Has_ID(FROM Application, TO ID)
+  CREATE UNDIRECTED EDGE Application_Has_Device(FROM Application, TO Device)
+  CREATE UNDIRECTED EDGE Application_Has_IP(FROM Application, TO IP)
+  CREATE UNDIRECTED EDGE Same_Application(FROM Application, TO Application, score DOUBLE)
+  CREATE UNDIRECTED EDGE Application_Has_Address(FROM Application, TO Address)
+  CREATE UNDIRECTED EDGE Application_In_Ring(FROM Application, TO Connected_Component)
+  CREATE UNDIRECTED EDGE Application_Has_Product(FROM Application, TO Product)
+  CREATE UNDIRECTED EDGE Account_Has_Product(FROM Account, TO Product)
+  CREATE UNDIRECTED EDGE Transfer_Transaction_Has_Product(FROM Transfer_Transaction, TO Product)
+  CREATE UNDIRECTED EDGE Application_Has_Account(FROM Application, TO Account)
+  CREATE UNDIRECTED EDGE Application_Has_Party(FROM Party, TO Application)
+  CREATE UNDIRECTED EDGE Application_Has_Card(FROM Application, TO Card)
 
   //CREATE GRAPH Financial_Crime (*)
