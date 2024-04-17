@@ -1,4 +1,4 @@
-CREATE QUERY set_application_fraud_status(VERTEX<Application> application, BOOL fraud_status) { 
+CREATE OR REPLACE QUERY set_application_fraud_status(VERTEX<Application> application, BOOL fraud_status) { 
   
   start = {application};
   
