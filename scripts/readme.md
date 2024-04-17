@@ -8,7 +8,7 @@ solution name/
     schema.json
     style.json
     Insights*.json
-    queriesDocs.json
+    metadata_descriptor.json
     images/
   schema/
     schema.gsql
